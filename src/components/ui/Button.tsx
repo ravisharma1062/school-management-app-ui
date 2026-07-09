@@ -11,13 +11,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60';
+  'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.97]';
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700',
-  secondary: 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50',
-  danger: 'bg-red-600 text-white hover:bg-red-700',
-  ghost: 'text-slate-600 hover:bg-slate-100',
+  primary:
+    'bg-gradient-to-r from-brand-600 to-accent-600 bg-[length:150%_100%] bg-left text-white shadow-glow hover:bg-right hover:shadow-glow-lg hover:-translate-y-px',
+  secondary:
+    'border border-slate-200 bg-white/80 text-slate-700 shadow-sm backdrop-blur hover:border-brand-300 hover:text-brand-700 hover:shadow-card',
+  danger: 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-md hover:shadow-lg hover:-translate-y-px',
+  ghost: 'text-slate-600 hover:bg-brand-50 hover:text-brand-700',
 };
 
 const sizes: Record<Size, string> = {

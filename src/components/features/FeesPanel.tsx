@@ -38,14 +38,14 @@ export function FeesPanel({ studentId, canEdit }: { studentId: string; canEdit: 
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-6 rounded-lg bg-slate-50 px-4 py-3">
+      <div className="flex flex-wrap items-center gap-6 rounded-2xl bg-gradient-to-r from-emerald-50 to-brand-50/60 px-5 py-4 ring-1 ring-inset ring-emerald-100">
         <div>
-          <p className="text-2xl font-semibold text-slate-900">{formatMoney(totalPaid)}</p>
-          <p className="text-xs text-slate-500">Total paid</p>
+          <p className="text-2xl font-extrabold text-emerald-600">{formatMoney(totalPaid)}</p>
+          <p className="text-xs font-medium text-slate-500">Total paid</p>
         </div>
         <div>
-          <p className="text-2xl font-semibold text-slate-900">{formatMoney(totalDue - totalPaid)}</p>
-          <p className="text-xs text-slate-500">Outstanding</p>
+          <p className="text-2xl font-extrabold text-slate-900">{formatMoney(totalDue - totalPaid)}</p>
+          <p className="text-xs font-medium text-slate-500">Outstanding</p>
         </div>
       </div>
       <Table>
@@ -144,7 +144,7 @@ function EditFeeModal({
     >
       <form id="fee-form" onSubmit={onSubmit} className="space-y-4" noValidate>
         {error && (
-          <div role="alert" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div role="alert" className="animate-scale-in rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm font-medium text-red-700">
             {error}
           </div>
         )}

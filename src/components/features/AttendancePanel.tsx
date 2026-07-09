@@ -37,14 +37,14 @@ export function AttendancePanel({ studentId }: { studentId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-6 rounded-lg bg-slate-50 px-4 py-3">
+      <div className="flex flex-wrap items-center gap-6 rounded-2xl bg-gradient-to-r from-brand-50 to-accent-50/60 px-5 py-4 ring-1 ring-inset ring-brand-100">
         <div>
-          <p className="text-2xl font-semibold text-slate-900">{pct.toFixed(1)}%</p>
-          <p className="text-xs text-slate-500">Attendance (present + late)</p>
+          <p className="text-gradient text-2xl font-extrabold">{pct.toFixed(1)}%</p>
+          <p className="text-xs font-medium text-slate-500">Attendance (present + late)</p>
         </div>
         <div>
-          <p className="text-2xl font-semibold text-slate-900">{query.data.length}</p>
-          <p className="text-xs text-slate-500">Days recorded</p>
+          <p className="text-2xl font-extrabold text-slate-900">{query.data.length}</p>
+          <p className="text-xs font-medium text-slate-500">Days recorded</p>
         </div>
       </div>
       <Table>

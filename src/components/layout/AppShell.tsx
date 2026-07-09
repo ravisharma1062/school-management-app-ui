@@ -23,13 +23,20 @@ export function AppShell() {
     .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="bg-mesh min-h-screen bg-slate-50">
+      {/* Decorative floating blobs behind everything */}
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-32 -left-24 h-96 w-96 animate-blob rounded-full bg-brand-300/20 blur-3xl" />
+        <div className="absolute top-1/3 -right-32 h-[28rem] w-[28rem] animate-blob-slow rounded-full bg-accent-300/20 blur-3xl" />
+        <div className="absolute -bottom-40 left-1/3 h-96 w-96 animate-blob rounded-full bg-sky-300/20 blur-3xl" />
+      </div>
+
       {/* Top bar */}
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4">
+      <header className="glass sticky top-0 z-30 flex h-16 items-center justify-between border-x-0 border-t-0 px-4 shadow-sm">
         <div className="flex items-center gap-3">
           <button
             type="button"
-            className="rounded p-2 text-slate-500 hover:bg-slate-100 lg:hidden"
+            className="rounded-xl p-2 text-slate-500 transition-colors hover:bg-brand-50 hover:text-brand-600 lg:hidden"
             aria-label="Toggle navigation"
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((o) => !o)}
@@ -38,34 +45,46 @@ export function AppShell() {
               <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
             </svg>
           </button>
-          <span className="text-lg font-semibold text-brand-700">🏫 School Admin</span>
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-accent-500 text-lg shadow-glow">
+            🎓
+          </span>
+          <div className="leading-tight">
+            <span className="text-gradient block text-lg font-extrabold tracking-tight">School Management</span>
+            <span className="hidden text-[11px] font-medium uppercase tracking-widest text-slate-400 sm:block">
+              {roleLabel[role]} Portal
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden text-right sm:block">
-            <p className="text-sm font-medium text-slate-800">{user?.name}</p>
-            <p className="text-xs text-slate-500">{roleLabel[role]}</p>
+            <p className="text-sm font-semibold text-slate-800">{user?.name}</p>
+            <p className="text-xs font-medium text-brand-600">{roleLabel[role]}</p>
           </div>
           <div
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent-500 p-[2px] shadow-glow"
             title={user?.email}
           >
-            {initials}
+            <span className="flex h-full w-full items-center justify-center rounded-full bg-white text-sm font-bold text-brand-700">
+              {initials}
+            </span>
           </div>
           <button
             type="button"
             onClick={logout}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+            className="rounded-xl border border-slate-200 bg-white/70 px-3 py-1.5 text-sm font-semibold text-slate-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600"
           >
             Sign out
           </button>
         </div>
       </header>
 
-      <div className="mx-auto flex w-full max-w-7xl">
+      <div className="relative mx-auto flex w-full max-w-7xl">
         {/* Sidebar — desktop */}
-        <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white lg:block">
-          <div className="sticky top-14">
-            <Sidebar role={role} />
+        <aside className="hidden w-64 shrink-0 lg:block">
+          <div className="sticky top-16 p-3">
+            <div className="glass rounded-2xl shadow-card">
+              <Sidebar role={role} />
+            </div>
           </div>
         </aside>
 
@@ -73,11 +92,11 @@ export function AppShell() {
         {mobileOpen && (
           <div className="fixed inset-0 z-20 lg:hidden">
             <div
-              className="absolute inset-0 bg-slate-900/40"
+              className="absolute inset-0 animate-fade-in bg-slate-900/40 backdrop-blur-sm"
               onClick={() => setMobileOpen(false)}
               aria-hidden="true"
             />
-            <div className="absolute left-0 top-14 h-full w-60 bg-white shadow-xl">
+            <div className="glass absolute left-0 top-16 h-full w-64 animate-fade-in shadow-2xl">
               <Sidebar role={role} onNavigate={() => setMobileOpen(false)} />
             </div>
           </div>

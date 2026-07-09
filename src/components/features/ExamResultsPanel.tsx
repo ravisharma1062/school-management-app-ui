@@ -144,7 +144,7 @@ function RecordResultModal({
     >
       <form id="result-form" onSubmit={onSubmit} className="space-y-4" noValidate>
         {error && (
-          <div role="alert" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div role="alert" className="animate-scale-in rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm font-medium text-red-700">
             {error}
           </div>
         )}

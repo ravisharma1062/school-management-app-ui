@@ -5,21 +5,24 @@ import type { Role } from '@/types';
 export function Sidebar({ role, onNavigate }: { role: Role; onNavigate?: () => void }) {
   const items = navFor(role);
   return (
-    <nav className="flex flex-col gap-1 p-3" aria-label="Main navigation">
+    <nav className="stagger flex flex-col gap-1.5 p-3" aria-label="Main navigation">
       {items.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
           onClick={onNavigate}
           className={({ isActive }) =>
-            `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+            `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
               isActive
-                ? 'bg-brand-50 text-brand-700'
-                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                ? 'bg-gradient-to-r from-brand-600 to-accent-600 text-white shadow-glow'
+                : 'text-slate-600 hover:translate-x-1 hover:bg-brand-50 hover:text-brand-700'
             }`
           }
         >
-          <span aria-hidden="true" className="text-base">
+          <span
+            aria-hidden="true"
+            className="text-lg transition-transform duration-200 group-hover:scale-110"
+          >
             {item.icon}
           </span>
           {item.label}

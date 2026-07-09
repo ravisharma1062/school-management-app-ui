@@ -79,14 +79,14 @@ export function TimetablePage() {
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse text-sm">
               <thead>
-                <tr className="bg-slate-50">
-                  <th className="border border-slate-200 px-3 py-2 text-left text-xs font-semibold uppercase text-slate-500">
+                <tr className="bg-gradient-to-r from-brand-50/80 to-accent-50/60">
+                  <th className="border border-slate-100 px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wider text-brand-800/70">
                     Period
                   </th>
                   {WEEK.map((d) => (
                     <th
                       key={d}
-                      className="border border-slate-200 px-3 py-2 text-left text-xs font-semibold uppercase text-slate-500"
+                      className="border border-slate-100 px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wider text-brand-800/70"
                     >
                       {DAY_LABEL[d]}
                     </th>
@@ -95,14 +95,16 @@ export function TimetablePage() {
               </thead>
               <tbody>
                 {periods.map((p) => (
-                  <tr key={p}>
-                    <td className="border border-slate-200 px-3 py-2 font-medium text-slate-700">{p}</td>
+                  <tr key={p} className="transition-colors hover:bg-brand-50/40">
+                    <td className="border border-slate-100 px-3 py-2 font-bold text-brand-700">{p}</td>
                     {WEEK.map((d) => {
                       const entry = grid.get(`${d}|${p}`);
                       return (
-                        <td key={d} className="border border-slate-200 px-3 py-2">
+                        <td key={d} className="border border-slate-100 px-3 py-2">
                           {entry ? (
-                            <span className="font-medium text-slate-900">{entry.subject}</span>
+                            <span className="inline-flex rounded-lg bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 ring-1 ring-inset ring-brand-100">
+                              {entry.subject}
+                            </span>
                           ) : (
                             <span className="text-slate-300">—</span>
                           )}
@@ -198,7 +200,7 @@ function AddTimetableModal({
     >
       <form id="tt-form" onSubmit={onSubmit} className="space-y-4" noValidate>
         {error && (
-          <div role="alert" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div role="alert" className="animate-scale-in rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm font-medium text-red-700">
             {error}
           </div>
         )}

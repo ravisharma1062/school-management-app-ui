@@ -75,17 +75,20 @@ export function StudentDetailPage() {
           />
 
           {/* Tabs */}
-          <div className="mb-4 flex gap-1 border-b border-slate-200" role="tablist">
+          <div
+            className="glass mb-4 inline-flex flex-wrap gap-1 rounded-2xl p-1.5 shadow-card"
+            role="tablist"
+          >
             {tabs.map((t) => (
               <button
                 key={t}
                 role="tab"
                 aria-selected={activeTab === t}
                 onClick={() => setTab(t)}
-                className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+                className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200 ${
                   activeTab === t
-                    ? 'border-brand-600 text-brand-700'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
+                    ? 'bg-gradient-to-r from-brand-600 to-accent-600 text-white shadow-glow'
+                    : 'text-slate-500 hover:bg-brand-50 hover:text-brand-700'
                 }`}
               >
                 {TAB_LABEL[t]}
