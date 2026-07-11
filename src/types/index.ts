@@ -463,6 +463,43 @@ export interface StudentTransportAssignRequest {
   stopId: string;
 }
 
+// --- Library ---
+export type BookIssueStatus = 'ISSUED' | 'RETURNED';
+
+export interface BookDto {
+  id: string;
+  title: string;
+  author: string;
+  isbn?: string | null;
+  totalCopies: number;
+  availableCopies: number;
+}
+
+export interface BookCreateRequest {
+  title: string;
+  author: string;
+  isbn?: string;
+  totalCopies: number;
+}
+
+export interface BookIssueDto {
+  id: string;
+  bookId: string;
+  bookTitle: string;
+  studentId: string;
+  studentName: string;
+  issuedAt: string;
+  dueDate: string;
+  returnedAt?: string | null;
+  fineAmount?: number | null;
+  status: BookIssueStatus;
+}
+
+export interface BookIssueCreateRequest {
+  bookId: string;
+  studentId: string;
+}
+
 // --- Spring Data Page<T> (subset we actually use) ---
 export interface Page<T> {
   content: T[];

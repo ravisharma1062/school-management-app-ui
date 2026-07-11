@@ -17,6 +17,7 @@ import { MessagesPage } from '@/pages/messages/MessagesPage';
 import { EventsPage } from '@/pages/events/EventsPage';
 import { AnalyticsDashboardPage } from '@/pages/analytics/AnalyticsDashboardPage';
 import { TransportRoutesPage } from '@/pages/transport/TransportRoutesPage';
+import { LibraryPage } from '@/pages/library/LibraryPage';
 import { NotificationPreferencesPage } from '@/pages/notification-preferences/NotificationPreferencesPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -38,6 +39,7 @@ export function App() {
           <Route path="/notices" element={<NoticesPage />} />
           <Route path="/leave-requests" element={<LeaveRequestsPage />} />
           <Route path="/events" element={<EventsPage />} />
+          <Route path="/library" element={<LibraryPage />} />
 
           {/* Admin / Teacher */}
           <Route element={<RoleGuard allow={['ADMIN', 'TEACHER']} />}>
