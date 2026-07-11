@@ -65,7 +65,7 @@ export function LeaveRequestsPage() {
 
       <div className="mb-4 mt-6 flex items-center gap-3">
         <label htmlFor="status-filter" className="text-sm text-slate-600">
-          Status
+          {t('leaveRequests.status')}
         </label>
         <div className="w-44">
           <Select
@@ -76,10 +76,10 @@ export function LeaveRequestsPage() {
               setPage(0);
             }}
           >
-            <option value="">All</option>
-            <option value="PENDING">Pending</option>
-            <option value="APPROVED">Approved</option>
-            <option value="REJECTED">Rejected</option>
+            <option value="">{t('leaveRequests.all')}</option>
+            <option value="PENDING">{t('leaveRequests.pending')}</option>
+            <option value="APPROVED">{t('leaveRequests.approved')}</option>
+            <option value="REJECTED">{t('leaveRequests.rejected')}</option>
           </Select>
         </div>
       </div>
@@ -96,8 +96,8 @@ export function LeaveRequestsPage() {
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : query.data && query.data.content.length === 0 ? (
         <EmptyState
-          title="No leave requests"
-          message={isAdmin ? 'Nothing to review right now.' : "You haven't submitted any leave requests yet."}
+          title={t('leaveRequests.noLeaveRequests')}
+          message={isAdmin ? t('leaveRequests.nothingToReview') : t('leaveRequests.noneSubmittedYet')}
         />
       ) : (
         query.data && (
@@ -105,12 +105,12 @@ export function LeaveRequestsPage() {
             <Table>
               <THead>
                 <TR>
-                  <TH>Type</TH>
-                  <TH>From</TH>
-                  <TH>To</TH>
-                  <TH>Reason</TH>
-                  <TH>Status</TH>
-                  {isAdmin && <TH className="text-right">Actions</TH>}
+                  <TH>{t('leaveRequests.type')}</TH>
+                  <TH>{t('leaveRequests.from')}</TH>
+                  <TH>{t('leaveRequests.to')}</TH>
+                  <TH>{t('leaveRequests.reason')}</TH>
+                  <TH>{t('leaveRequests.status')}</TH>
+                  {isAdmin && <TH className="text-right">{t('common.actions')}</TH>}
                 </TR>
               </THead>
               <TBody>
@@ -136,7 +136,7 @@ export function LeaveRequestsPage() {
                               }
                               onClick={() => reviewMutation.mutate({ id: r.id, status: 'APPROVED' })}
                             >
-                              Approve
+                              {t('leaveRequests.approve')}
                             </Button>
                             <Button
                               size="sm"
@@ -148,7 +148,7 @@ export function LeaveRequestsPage() {
                               }
                               onClick={() => reviewMutation.mutate({ id: r.id, status: 'REJECTED' })}
                             >
-                              Reject
+                              {t('leaveRequests.reject')}
                             </Button>
                           </div>
                         )}
@@ -181,6 +181,7 @@ const emptyForm: LeaveRequestCreateRequest = {
 };
 
 function RequestLeaveForm() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<LeaveRequestCreateRequest>(emptyForm);
   const [error, setError] = useState<string | null>(null);
@@ -210,7 +211,7 @@ function RequestLeaveForm() {
   return (
     <Card>
       <CardBody>
-        <h2 className="mb-4 text-sm font-bold text-slate-900">Submit a leave request</h2>
+        <h2 className="mb-4 text-sm font-bold text-slate-900">{t('leaveRequests.submitTitle')}</h2>
         <form onSubmit={onSubmit} className="space-y-4" noValidate>
           {error && (
             <div role="alert" className="animate-scale-in rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm font-medium text-red-700">
@@ -219,23 +220,23 @@ function RequestLeaveForm() {
           )}
           {success && (
             <div role="status" className="animate-scale-in rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-sm font-medium text-emerald-700">
-              Leave request submitted.
+              {t('leaveRequests.submitted')}
             </div>
           )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Select
-              label="Type"
+              label={t('leaveRequests.type')}
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value as LeaveType })}
             >
-              {LEAVE_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
+              {LEAVE_TYPES.map((lt) => (
+                <option key={lt} value={lt}>
+                  {lt}
                 </option>
               ))}
             </Select>
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-slate-700">From</span>
+              <span className="mb-1 block text-sm font-medium text-slate-700">{t('leaveRequests.from')}</span>
               <input
                 type="date"
                 required
@@ -245,7 +246,7 @@ function RequestLeaveForm() {
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-sm font-medium text-slate-700">To</span>
+              <span className="mb-1 block text-sm font-medium text-slate-700">{t('leaveRequests.to')}</span>
               <input
                 type="date"
                 required
@@ -256,14 +257,14 @@ function RequestLeaveForm() {
             </label>
           </div>
           <Textarea
-            label="Reason (optional)"
+            label={t('leaveRequests.reasonOptional')}
             rows={3}
             value={form.reason ?? ''}
             onChange={(e) => setForm({ ...form, reason: e.target.value })}
           />
           <div className="flex justify-end">
             <Button type="submit" loading={mutation.isPending}>
-              Submit request
+              {t('leaveRequests.submitButton')}
             </Button>
           </div>
         </form>

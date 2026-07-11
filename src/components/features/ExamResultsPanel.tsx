@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { examResultsApi } from '@/api/examResults';
 import { extractErrorMessage } from '@/api/client';
 import {
@@ -26,6 +27,7 @@ export function ExamResultsPanel({
   studentId: string;
   canRecord: boolean;
 }) {
+  const { t } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const query = useQuery({
@@ -61,11 +63,11 @@ export function ExamResultsPanel({
             downloadMutation.mutate();
           }}
         >
-          Download report card
+          {t('examResults.downloadReportCard')}
         </Button>
         {canRecord && (
           <Button size="sm" onClick={() => setModalOpen(true)}>
-            + Record result
+            {t('examResults.recordResult')}
           </Button>
         )}
       </div>
@@ -75,16 +77,16 @@ export function ExamResultsPanel({
       ) : query.isError ? (
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : !query.data || query.data.length === 0 ? (
-        <EmptyState title="No exam results" message="No results have been recorded for this student yet." />
+        <EmptyState title={t('examResults.noExamResults')} message={t('examResults.noneRecorded')} />
       ) : (
         <Table>
           <THead>
             <TR>
-              <TH>Term</TH>
-              <TH>Exam</TH>
-              <TH>Subject</TH>
-              <TH>Marks</TH>
-              <TH>Grade</TH>
+              <TH>{t('examResults.term')}</TH>
+              <TH>{t('examResults.exam')}</TH>
+              <TH>{t('examResults.subject')}</TH>
+              <TH>{t('examResults.marks')}</TH>
+              <TH>{t('examResults.grade')}</TH>
             </TR>
           </THead>
           <TBody>
@@ -127,6 +129,7 @@ function RecordResultModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState<string | null>(null);
@@ -158,14 +161,14 @@ function RecordResultModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="Record exam result"
+      title={t('examResults.recordResultModal')}
       footer={
         <>
           <Button variant="secondary" type="button" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" form="result-form" loading={mutation.isPending}>
-            Save result
+            {t('examResults.saveResult')}
           </Button>
         </>
       }
@@ -178,14 +181,14 @@ function RecordResultModal({
         )}
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Term"
+            label={t('examResults.term')}
             required
             placeholder="e.g. Term 1"
             value={form.term}
             onChange={(e) => setForm({ ...form, term: e.target.value })}
           />
           <Input
-            label="Exam name"
+            label={t('examResults.examName')}
             required
             placeholder="e.g. Midterm"
             value={form.examName}
@@ -193,7 +196,7 @@ function RecordResultModal({
           />
         </div>
         <Input
-          label="Subject"
+          label={t('examResults.subject')}
           required
           placeholder="e.g. Mathematics"
           value={form.subject}
@@ -201,7 +204,7 @@ function RecordResultModal({
         />
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Marks obtained"
+            label={t('examResults.marksObtained')}
             type="number"
             min={0}
             step="0.01"
@@ -210,7 +213,7 @@ function RecordResultModal({
             onChange={(e) => setForm({ ...form, marksObtained: e.target.value })}
           />
           <Input
-            label="Max marks"
+            label={t('examResults.maxMarks')}
             type="number"
             min={0}
             step="0.01"
@@ -219,7 +222,7 @@ function RecordResultModal({
             onChange={(e) => setForm({ ...form, maxMarks: e.target.value })}
           />
         </div>
-        <p className="text-xs text-slate-500">The letter grade is computed automatically by the server.</p>
+        <p className="text-xs text-slate-500">{t('examResults.gradeComputedNote')}</p>
       </form>
     </Modal>
   );

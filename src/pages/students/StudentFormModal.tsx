@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { studentsApi } from '@/api/students';
 import { usersApi } from '@/api/users';
 import { extractErrorMessage } from '@/api/client';
@@ -22,6 +23,7 @@ const empty: StudentCreateRequest = {
 };
 
 export function StudentFormModal({ open, onClose, student }: Props) {
+  const { t } = useTranslation();
   const isEdit = !!student;
   const queryClient = useQueryClient();
   const [form, setForm] = useState<StudentCreateRequest>(empty);
@@ -77,14 +79,14 @@ export function StudentFormModal({ open, onClose, student }: Props) {
     <Modal
       open={open}
       onClose={onClose}
-      title={isEdit ? 'Edit student' : 'Add student'}
+      title={isEdit ? t('studentForm.editStudent') : t('studentForm.addStudent')}
       footer={
         <>
           <Button variant="secondary" onClick={onClose} type="button">
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" form="student-form" loading={mutation.isPending}>
-            {isEdit ? 'Save changes' : 'Create student'}
+            {isEdit ? t('studentForm.saveChanges') : t('studentForm.createStudent')}
           </Button>
         </>
       }
@@ -96,20 +98,20 @@ export function StudentFormModal({ open, onClose, student }: Props) {
           </div>
         )}
         <Input
-          label="Full name"
+          label={t('studentForm.fullName')}
           required
           value={form.name}
           onChange={(e) => update('name', e.target.value)}
         />
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Roll number"
+            label={t('studentForm.rollNumber')}
             required
             value={form.rollNo}
             onChange={(e) => update('rollNo', e.target.value)}
           />
           <Input
-            label="Date of birth"
+            label={t('studentForm.dateOfBirth')}
             type="date"
             required
             value={form.dob}
@@ -118,14 +120,14 @@ export function StudentFormModal({ open, onClose, student }: Props) {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Class"
+            label={t('studentForm.class')}
             required
             placeholder="e.g. 5"
             value={form.studentClass}
             onChange={(e) => update('studentClass', e.target.value)}
           />
           <Input
-            label="Section"
+            label={t('studentForm.section')}
             required
             placeholder="e.g. A"
             value={form.section}
@@ -133,11 +135,11 @@ export function StudentFormModal({ open, onClose, student }: Props) {
           />
         </div>
         <Select
-          label="Parent (optional)"
+          label={t('studentForm.parentOptional')}
           value={form.parentId ?? ''}
           onChange={(e) => update('parentId', e.target.value || undefined)}
         >
-          <option value="">— No parent linked —</option>
+          <option value="">{t('studentForm.noParentLinked')}</option>
           {parents?.content.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name} ({p.email})

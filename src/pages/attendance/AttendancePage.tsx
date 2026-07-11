@@ -91,7 +91,7 @@ export function AttendancePage() {
       );
     },
     onSuccess: () => {
-      setBanner({ type: 'ok', text: `Attendance saved for ${roster.length} students.` });
+      setBanner({ type: 'ok', text: t('attendance.attendanceSavedFor', { count: roster.length }) });
       queryClient.invalidateQueries({ queryKey: ['attendance'] });
     },
     onError: (err) => setBanner({ type: 'err', text: extractErrorMessage(err) }),
@@ -104,21 +104,21 @@ export function AttendancePage() {
       <Card className="mb-6">
         <CardBody>
           {rosterQuery.isLoading ? (
-            <LoadingState label="Loading roster…" />
+            <LoadingState label={t('attendance.loadingRoster')} />
           ) : rosterQuery.isError ? (
             <ErrorState error={rosterQuery.error} onRetry={() => rosterQuery.refetch()} />
           ) : (
             <div className="flex flex-wrap items-end gap-4">
               <div className="w-40">
                 <Select
-                  label="Class"
+                  label={t('attendance.class')}
                   value={studentClass}
                   onChange={(e) => {
                     setStudentClass(e.target.value);
                     setSection('');
                   }}
                 >
-                  <option value="">— Select —</option>
+                  <option value="">{t('common.selectPlaceholder')}</option>
                   {classOptions.map((c) => (
                     <option key={c} value={c}>
                       {c}
@@ -128,12 +128,12 @@ export function AttendancePage() {
               </div>
               <div className="w-40">
                 <Select
-                  label="Section"
+                  label={t('attendance.section')}
                   value={section}
                   onChange={(e) => setSection(e.target.value)}
                   disabled={!studentClass}
                 >
-                  <option value="">— Select —</option>
+                  <option value="">{t('common.selectPlaceholder')}</option>
                   {sectionOptions.map((s) => (
                     <option key={s} value={s}>
                       {s}
@@ -143,7 +143,7 @@ export function AttendancePage() {
               </div>
               <div className="w-48">
                 <Input
-                  label="Date"
+                  label={t('attendance.date')}
                   type="date"
                   max={todayIso()}
                   value={date}
@@ -169,19 +169,19 @@ export function AttendancePage() {
       )}
 
       {!canQuery ? (
-        <EmptyState title="Select a class, section and date" message="Choose above to load the roster." />
+        <EmptyState title={t('attendance.selectClassSectionDate')} message={t('attendance.chooseAboveToLoad')} />
       ) : existingQuery.isLoading ? (
         <LoadingState />
       ) : roster.length === 0 ? (
-        <EmptyState title="No students" message="No students found for this class and section." />
+        <EmptyState title={t('attendance.noStudents')} message={t('attendance.noStudentsForClass')} />
       ) : (
         <Card>
           <Table>
             <THead>
               <TR>
-                <TH>Roll no.</TH>
-                <TH>Name</TH>
-                <TH>Status</TH>
+                <TH>{t('attendance.rollNo')}</TH>
+                <TH>{t('attendance.name')}</TH>
+                <TH>{t('attendance.status')}</TH>
               </TR>
             </THead>
             <TBody>
@@ -192,7 +192,7 @@ export function AttendancePage() {
                   <TD>
                     <div className="w-40">
                       <Select
-                        aria-label={`Attendance status for ${s.name}`}
+                        aria-label={t('attendance.attendanceStatusFor', { name: s.name })}
                         value={statuses[s.id] ?? 'PRESENT'}
                         onChange={(e) =>
                           setStatuses((prev) => ({ ...prev, [s.id]: e.target.value as AttendanceStatus }))
@@ -212,7 +212,7 @@ export function AttendancePage() {
           </Table>
           <div className="flex justify-end border-t border-slate-100 px-4 py-3">
             <Button onClick={() => saveMutation.mutate()} loading={saveMutation.isPending}>
-              Save attendance
+              {t('attendance.saveAttendance')}
             </Button>
           </div>
         </Card>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { studentsApi } from '@/api/students';
 import { extractErrorMessage } from '@/api/client';
 import { useAuth } from '@/context/AuthContext';
@@ -34,16 +35,16 @@ const TAB_ROLES: Record<TabKey, Role[]> = {
   library: ['ADMIN', 'PARENT'],
 };
 
-const TAB_LABEL: Record<TabKey, string> = {
-  profile: 'Profile',
-  attendance: 'Attendance',
-  results: 'Exam Results',
-  fees: 'Fees',
-  transport: 'Transport',
-  library: 'Library',
-};
-
 export function StudentDetailPage() {
+  const { t } = useTranslation();
+  const TAB_LABEL: Record<TabKey, string> = {
+    profile: t('studentDetail.profile'),
+    attendance: t('studentDetail.attendance'),
+    results: t('studentDetail.results'),
+    fees: t('studentDetail.fees'),
+    transport: t('studentDetail.transport'),
+    library: t('studentDetail.library'),
+  };
   const { id = '' } = useParams();
   const { role } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
@@ -76,7 +77,7 @@ export function StudentDetailPage() {
     <div>
       <div className="mb-4">
         <Link to={backLink} className="text-sm text-brand-600 hover:text-brand-700">
-          ← Back
+          {t('studentDetail.back')}
         </Link>
       </div>
 
@@ -90,20 +91,20 @@ export function StudentDetailPage() {
             title={
               <span className="inline-flex items-center gap-2">
                 {query.data.name}
-                {!query.data.active && <Badge tone="gray">Archived</Badge>}
+                {!query.data.active && <Badge tone="gray">{t('common.archived')}</Badge>}
               </span>
             }
-            description={`Class ${query.data.studentClass}-${query.data.section} · Roll ${query.data.rollNo}`}
+            description={`${t('studentDetail.class')} ${query.data.studentClass}-${query.data.section} · ${t('common.rollNo')} ${query.data.rollNo}`}
             action={
               role === 'ADMIN' ? (
                 <div className="flex items-center gap-2">
-                  <Button onClick={() => setEditOpen(true)}>Edit</Button>
+                  <Button onClick={() => setEditOpen(true)}>{t('common.edit')}</Button>
                   <Button
                     variant="danger"
                     loading={archiveMutation.isPending}
                     onClick={() => archiveMutation.mutate()}
                   >
-                    {query.data.active ? 'Archive' : 'Restore'}
+                    {query.data.active ? t('common.archive') : t('common.restore')}
                   </Button>
                 </div>
               ) : undefined
@@ -140,15 +141,15 @@ export function StudentDetailPage() {
 
           {activeTab === 'profile' && (
             <Card>
-              <CardHeader title="Profile" />
+              <CardHeader title={t('studentDetail.profile')} />
               <CardBody>
                 <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field label="Full name" value={query.data.name} />
-                  <Field label="Roll number" value={query.data.rollNo} />
-                  <Field label="Class" value={query.data.studentClass} />
-                  <Field label="Section" value={query.data.section} />
-                  <Field label="Date of birth" value={formatDate(query.data.dob)} />
-                  <Field label="Parent linked" value={query.data.parentId ? 'Yes' : 'No'} />
+                  <Field label={t('studentDetail.fullName')} value={query.data.name} />
+                  <Field label={t('studentDetail.rollNumber')} value={query.data.rollNo} />
+                  <Field label={t('studentDetail.class')} value={query.data.studentClass} />
+                  <Field label={t('studentDetail.section')} value={query.data.section} />
+                  <Field label={t('studentDetail.dateOfBirth')} value={formatDate(query.data.dob)} />
+                  <Field label={t('studentDetail.parentLinked')} value={query.data.parentId ? t('common.yes') : t('common.no')} />
                 </dl>
               </CardBody>
             </Card>

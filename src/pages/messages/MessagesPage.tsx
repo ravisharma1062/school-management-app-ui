@@ -74,7 +74,7 @@ export function MessagesPage() {
                 {newContacts.length > 0 && (
                   <div className="mt-3 border-t border-slate-100 pt-3">
                     <p className="px-3 pb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                      Start a new conversation
+                      {t('messages.startNewConversation')}
                     </p>
                     {newContacts.map((contact) => (
                       <button
@@ -90,12 +90,8 @@ export function MessagesPage() {
                 )}
                 {(conversationsQuery.data ?? []).length === 0 && newContacts.length === 0 && (
                   <EmptyState
-                    title="No contacts yet"
-                    message={
-                      role === 'PARENT'
-                        ? "You'll see your children's teachers here once they're assigned to a class."
-                        : "You'll see parents of your students here once you're assigned to a class."
-                    }
+                    title={t('messages.noContactsYet')}
+                    message={role === 'PARENT' ? t('messages.noContactsParent') : t('messages.noContactsTeacher')}
                   />
                 )}
               </>
@@ -108,7 +104,7 @@ export function MessagesPage() {
             <ConversationThread conversationId={selectedId} currentUserId={user?.id} />
           ) : (
             <div className="p-8">
-              <EmptyState title="Select a conversation" message="Choose a conversation on the left, or start a new one." />
+              <EmptyState title={t('messages.selectConversation')} message={t('messages.chooseOrStart')} />
             </div>
           )}
         </Card>
@@ -118,6 +114,7 @@ export function MessagesPage() {
 }
 
 function ConversationThread({ conversationId, currentUserId }: { conversationId: string; currentUserId?: string }) {
+  const { t } = useTranslation();
   const [body, setBody] = useState('');
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
@@ -151,7 +148,7 @@ function ConversationThread({ conversationId, currentUserId }: { conversationId:
         ) : messagesQuery.isError ? (
           <ErrorState error={messagesQuery.error} onRetry={() => messagesQuery.refetch()} />
         ) : messagesQuery.data && messagesQuery.data.length === 0 ? (
-          <EmptyState title="No messages yet" message="Say hello to start the conversation." />
+          <EmptyState title={t('messages.noMessagesYet')} message={t('messages.sayHello')} />
         ) : (
           messagesQuery.data?.map((m) => {
             const mine = m.senderId === currentUserId;
@@ -178,7 +175,7 @@ function ConversationThread({ conversationId, currentUserId }: { conversationId:
           <input
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder="Type a message…"
+            placeholder={t('messages.typeMessage')}
             className="flex-1 rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
           />
           <button
@@ -186,7 +183,7 @@ function ConversationThread({ conversationId, currentUserId }: { conversationId:
             disabled={sendMutation.isPending || !body.trim()}
             className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
           >
-            Send
+            {t('messages.send')}
           </button>
         </div>
       </form>

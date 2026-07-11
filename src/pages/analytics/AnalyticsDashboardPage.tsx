@@ -48,7 +48,7 @@ export function AnalyticsDashboardPage() {
 
       <div className="mb-6 flex flex-wrap items-end gap-4">
         <div className="w-48">
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">Class (optional)</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">{t('analytics.classOptional')}</label>
           <input
             value={studentClass}
             onChange={(e) => setStudentClass(e.target.value)}
@@ -57,10 +57,10 @@ export function AnalyticsDashboardPage() {
           />
         </div>
         <div className="w-40">
-          <Select label="Range" value={String(range)} onChange={(e) => setRange(Number(e.target.value))}>
+          <Select label={t('analytics.range')} value={String(range)} onChange={(e) => setRange(Number(e.target.value))}>
             {RANGE_OPTIONS.map((r) => (
               <option key={r} value={r}>
-                Last {r} days
+                {t('analytics.lastNDays', { count: r })}
               </option>
             ))}
           </Select>
@@ -69,7 +69,7 @@ export function AnalyticsDashboardPage() {
 
       <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <CardHeader title="Attendance trend" subtitle="Share of marked days present or late, per day" />
+          <CardHeader title={t('analytics.attendanceTrend')} subtitle={t('analytics.attendanceTrendSubtitle')} />
           <CardBody>
             {attendanceQuery.isLoading ? (
               <LoadingState />
@@ -82,7 +82,7 @@ export function AnalyticsDashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader title="Fee collection" />
+          <CardHeader title={t('analytics.feeCollection')} />
           <CardBody>
             {feeSummaryQuery.isLoading ? (
               <LoadingState />
@@ -95,7 +95,7 @@ export function AnalyticsDashboardPage() {
                     <span className="text-2xl font-extrabold text-slate-900">
                       {feeSummaryQuery.data.collectionPercentage.toFixed(1)}%
                     </span>
-                    <span className="text-xs font-medium text-slate-500">collected</span>
+                    <span className="text-xs font-medium text-slate-500">{t('analytics.collected')}</span>
                   </div>
                   <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
                     <div
@@ -106,19 +106,19 @@ export function AnalyticsDashboardPage() {
                 </div>
                 <dl className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <dt className="text-xs text-slate-400">Total due</dt>
+                    <dt className="text-xs text-slate-400">{t('analytics.totalDue')}</dt>
                     <dd className="font-semibold text-slate-800">{formatMoney(feeSummaryQuery.data.totalDue)}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-400">Total paid</dt>
+                    <dt className="text-xs text-slate-400">{t('analytics.totalPaid')}</dt>
                     <dd className="font-semibold text-emerald-600">{formatMoney(feeSummaryQuery.data.totalPaid)}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-400">Outstanding</dt>
+                    <dt className="text-xs text-slate-400">{t('analytics.outstanding')}</dt>
                     <dd className="font-semibold text-slate-800">{formatMoney(feeSummaryQuery.data.totalOutstanding)}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-400">Overdue records</dt>
+                    <dt className="text-xs text-slate-400">{t('analytics.overdueRecords')}</dt>
                     <dd className="font-semibold text-red-600">{feeSummaryQuery.data.overdueCount}</dd>
                   </div>
                 </dl>
@@ -129,7 +129,7 @@ export function AnalyticsDashboardPage() {
       </div>
 
       <Card>
-        <CardHeader title="At-risk students" subtitle="Low attendance (below 75% over 30 days) or fees overdue 7+ days" />
+        <CardHeader title={t('analytics.atRiskStudents')} subtitle={t('analytics.atRiskSubtitle')} />
         {atRiskQuery.isLoading ? (
           <CardBody>
             <LoadingState />
@@ -140,17 +140,17 @@ export function AnalyticsDashboardPage() {
           </CardBody>
         ) : atRiskQuery.data && atRiskQuery.data.length === 0 ? (
           <CardBody>
-            <EmptyState title="No at-risk students" message="Nobody currently meets the attendance or fee risk criteria." />
+            <EmptyState title={t('analytics.noAtRisk')} message={t('analytics.nobodyMeetsRisk')} />
           </CardBody>
         ) : (
           atRiskQuery.data && (
             <Table>
               <THead>
                 <TR>
-                  <TH>Student</TH>
-                  <TH>Class</TH>
-                  <TH>Attendance</TH>
-                  <TH>Fees</TH>
+                  <TH>{t('analytics.student')}</TH>
+                  <TH>{t('analytics.classCol')}</TH>
+                  <TH>{t('analytics.attendanceCol')}</TH>
+                  <TH>{t('analytics.feesCol')}</TH>
                 </TR>
               </THead>
               <TBody>
@@ -162,14 +162,14 @@ export function AnalyticsDashboardPage() {
                     </TD>
                     <TD>
                       {s.attendanceAtRisk ? (
-                        <Badge tone="red">{s.attendancePercentage?.toFixed(0)}% present</Badge>
+                        <Badge tone="red">{s.attendancePercentage?.toFixed(0)}% {t('analytics.present')}</Badge>
                       ) : (
                         <span className="text-slate-400">—</span>
                       )}
                     </TD>
                     <TD>
                       {s.feeAtRisk ? (
-                        <Badge tone="red">{s.maxDaysOverdue} days overdue</Badge>
+                        <Badge tone="red">{s.maxDaysOverdue} {t('analytics.daysOverdue')}</Badge>
                       ) : (
                         <span className="text-slate-400">—</span>
                       )}
@@ -186,7 +186,8 @@ export function AnalyticsDashboardPage() {
 }
 
 function AttendanceTrendChart({ points }: { points: AttendanceTrendPointDto[] }) {
-  if (points.length === 0) return <EmptyState title="No data" message="No attendance records in this range." />;
+  const { t } = useTranslation();
+  if (points.length === 0) return <EmptyState title={t('analytics.noData')} message={t('analytics.noAttendanceInRange')} />;
 
   const width = 700;
   const height = 220;

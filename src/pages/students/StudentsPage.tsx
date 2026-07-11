@@ -68,9 +68,9 @@ export function StudentsPage() {
           isAdmin ? (
             <div className="flex items-center gap-2">
               <Button variant="secondary" onClick={() => setImportOpen(true)}>
-                Import CSV
+                {t('students.importCsv')}
               </Button>
-              <Button onClick={() => setModalOpen(true)}>+ Add student</Button>
+              <Button onClick={() => setModalOpen(true)}>{t('students.addStudent')}</Button>
             </div>
           ) : undefined
         }
@@ -79,24 +79,24 @@ export function StudentsPage() {
       <div className="mb-4 flex flex-wrap items-end gap-3">
         <div className="w-48">
           <Input
-            label="Name"
-            placeholder="Search by name"
+            label={t('common.name')}
+            placeholder={t('students.searchByName')}
             value={filters.name}
             onChange={(e) => updateFilter('name', e.target.value)}
           />
         </div>
         <div className="w-40">
           <Input
-            label="Roll no."
-            placeholder="Search by roll no."
+            label={t('common.rollNo')}
+            placeholder={t('students.searchByRollNo')}
             value={filters.rollNo}
             onChange={(e) => updateFilter('rollNo', e.target.value)}
           />
         </div>
         <div className="w-32">
           <Input
-            label="Class"
-            placeholder="e.g. 9"
+            label={t('common.class')}
+            placeholder={t('students.classPlaceholder')}
             value={filters.studentClass}
             onChange={(e) => updateFilter('studentClass', e.target.value)}
           />
@@ -112,7 +112,7 @@ export function StudentsPage() {
               }}
               className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
             />
-            Show archived
+            {t('common.showArchived')}
           </label>
         )}
       </div>
@@ -123,9 +123,9 @@ export function StudentsPage() {
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : query.data && query.data.content.length === 0 ? (
         <EmptyState
-          title="No students found"
-          message={isAdmin ? 'Add a student or adjust your filters.' : 'No students match your filters.'}
-          action={isAdmin ? <Button onClick={() => setModalOpen(true)}>+ Add student</Button> : undefined}
+          title={t('students.noStudentsFound')}
+          message={isAdmin ? t('students.addStudentOrAdjust') : t('students.noStudentsMatch')}
+          action={isAdmin ? <Button onClick={() => setModalOpen(true)}>{t('students.addStudent')}</Button> : undefined}
         />
       ) : (
         query.data && (
@@ -133,12 +133,12 @@ export function StudentsPage() {
             <Table>
               <THead>
                 <TR>
-                  <TH>Name</TH>
-                  <TH>Roll no.</TH>
-                  <TH>Class</TH>
-                  <TH>Section</TH>
-                  <TH>Date of birth</TH>
-                  <TH className="text-right">Actions</TH>
+                  <TH>{t('common.name')}</TH>
+                  <TH>{t('common.rollNo')}</TH>
+                  <TH>{t('common.class')}</TH>
+                  <TH>{t('common.section')}</TH>
+                  <TH>{t('common.dateOfBirth')}</TH>
+                  <TH className="text-right">{t('common.actions')}</TH>
                 </TR>
               </THead>
               <TBody>
@@ -147,7 +147,7 @@ export function StudentsPage() {
                     <TD className="font-medium text-slate-900">
                       <span className="inline-flex items-center gap-2">
                         {s.name}
-                        {!s.active && <Badge tone="gray">Archived</Badge>}
+                        {!s.active && <Badge tone="gray">{t('common.archived')}</Badge>}
                       </span>
                     </TD>
                     <TD>{s.rollNo}</TD>
@@ -156,7 +156,7 @@ export function StudentsPage() {
                     <TD>{formatDate(s.dob)}</TD>
                     <TD className="text-right">
                       <Link to={`/students/${s.id}`} className="text-sm font-medium text-brand-600 hover:text-brand-700">
-                        View
+                        {t('common.view')}
                       </Link>
                     </TD>
                   </TR>
@@ -182,6 +182,7 @@ export function StudentsPage() {
 }
 
 function BulkImportModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<BulkImportResult | null>(null);
@@ -221,22 +222,22 @@ function BulkImportModal({ open, onClose }: { open: boolean; onClose: () => void
     <Modal
       open={open}
       onClose={close}
-      title="Import students from CSV"
+      title={t('students.importFromCsv')}
       footer={
         <>
           <Button variant="secondary" type="button" onClick={close}>
-            Close
+            {t('common.close')}
           </Button>
           <Button type="submit" form="bulk-import-form" loading={mutation.isPending} disabled={!file}>
-            Import
+            {t('students.import')}
           </Button>
         </>
       }
     >
       <form id="bulk-import-form" onSubmit={onSubmit} className="space-y-4" noValidate>
         <p className="text-sm text-slate-500">
-          Header row: <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">name,rollNo,studentClass,section,dob,parentEmail</code>
-          . <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">parentEmail</code> is optional; dates use{' '}
+          {t('students.headerRowNote')} <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">name,rollNo,studentClass,section,dob,parentEmail</code>
+          . <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">parentEmail</code> {t('students.parentEmailNote')}{' '}
           <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">yyyy-MM-dd</code>.
         </p>
         {error && (
@@ -249,15 +250,18 @@ function BulkImportModal({ open, onClose }: { open: boolean; onClose: () => void
         {result && (
           <div className="space-y-2">
             <p className="text-sm text-slate-700">
-              {result.successCount} of {result.totalRows} row{result.totalRows === 1 ? '' : 's'} imported
-              {result.failureCount > 0 && `, ${result.failureCount} failed`}.
+              {t(result.totalRows === 1 ? 'students.rowsImported_one' : 'students.rowsImported_other', {
+                success: result.successCount,
+                total: result.totalRows,
+              })}
+              {result.failureCount > 0 && t('students.rowsFailed', { count: result.failureCount })}.
             </p>
             {result.errors.length > 0 && (
               <Table>
                 <THead>
                   <TR>
-                    <TH>Row</TH>
-                    <TH>Error</TH>
+                    <TH>{t('students.row')}</TH>
+                    <TH>{t('students.error')}</TH>
                   </TR>
                 </THead>
                 <TBody>

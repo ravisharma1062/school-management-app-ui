@@ -1,6 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { eventsApi } from '@/api/events';
 import { extractErrorMessage } from '@/api/client';
 import { useAuth } from '@/context/AuthContext';
@@ -28,11 +29,9 @@ const RSVP_TONE: Record<RsvpStatus, 'green' | 'yellow' | 'red'> = {
   NOT_GOING: 'red',
 };
 
-const RSVP_LABEL: Record<RsvpStatus, string> = {
-  GOING: 'Going',
-  MAYBE: 'Maybe',
-  NOT_GOING: "Can't go",
-};
+function rsvpLabel(t: TFunction, status: RsvpStatus): string {
+  return t(`events.${status === 'GOING' ? 'going' : status === 'MAYBE' ? 'maybe' : 'cantGo'}`);
+}
 
 export function EventsPage() {
   const { t } = useTranslation();
@@ -53,7 +52,7 @@ export function EventsPage() {
       <PageHeader
         title={t('pages.events.title')}
         description={t('pages.events.description')}
-        action={isAdmin ? <Button onClick={() => setCreateOpen(true)}>+ Add event</Button> : undefined}
+        action={isAdmin ? <Button onClick={() => setCreateOpen(true)}>{t('events.addEvent')}</Button> : undefined}
       />
 
       <div className="mb-6 inline-flex rounded-xl bg-slate-100 p-1">
@@ -63,7 +62,7 @@ export function EventsPage() {
             view === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
           }`}
         >
-          List
+          {t('events.list')}
         </button>
         <button
           onClick={() => setView('month')}
@@ -71,7 +70,7 @@ export function EventsPage() {
             view === 'month' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
           }`}
         >
-          Month
+          {t('events.month')}
         </button>
       </div>
 
@@ -80,7 +79,7 @@ export function EventsPage() {
       ) : query.isError ? (
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : query.data && query.data.length === 0 ? (
-        <EmptyState title="No upcoming events" message="Check back later." />
+        <EmptyState title={t('events.noUpcomingEvents')} message={t('events.checkBackLater')} />
       ) : query.data ? (
         view === 'list' ? (
           <EventList events={query.data} isAdmin={isAdmin} />
@@ -112,6 +111,7 @@ function EventList({ events, isAdmin }: { events: EventDto[]; isAdmin: boolean }
 }
 
 function EventCard({ event, isAdmin }: { event: EventDto; isAdmin: boolean }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [showRsvps, setShowRsvps] = useState(false);
@@ -138,13 +138,13 @@ function EventCard({ event, isAdmin }: { event: EventDto; isAdmin: boolean }) {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-slate-900">{event.title}</h3>
-              {event.myRsvpStatus && <Badge tone={RSVP_TONE[event.myRsvpStatus]}>{RSVP_LABEL[event.myRsvpStatus]}</Badge>}
+              {event.myRsvpStatus && <Badge tone={RSVP_TONE[event.myRsvpStatus]}>{rsvpLabel(t, event.myRsvpStatus)}</Badge>}
             </div>
             {event.description && <p className="mt-1 text-sm text-slate-600">{event.description}</p>}
             {event.location && <p className="mt-1 text-xs text-slate-400">📍 {event.location}</p>}
           </div>
           <div className="shrink-0 text-right">
-            <p className="text-xs uppercase tracking-wide text-slate-400">Date</p>
+            <p className="text-xs uppercase tracking-wide text-slate-400">{t('events.date')}</p>
             <p className="text-sm font-medium text-slate-700">{formatDate(event.eventDate)}</p>
           </div>
         </div>
@@ -163,7 +163,7 @@ function EventCard({ event, isAdmin }: { event: EventDto; isAdmin: boolean }) {
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              {RSVP_LABEL[status]}
+              {rsvpLabel(t, status)}
             </button>
           ))}
           {isAdmin && (
@@ -171,7 +171,7 @@ function EventCard({ event, isAdmin }: { event: EventDto; isAdmin: boolean }) {
               className="ml-auto text-xs font-medium text-brand-600 hover:text-brand-700"
               onClick={() => setShowRsvps((v) => !v)}
             >
-              {showRsvps ? 'Hide RSVPs' : 'View RSVPs'}
+              {showRsvps ? t('events.hideRsvps') : t('events.viewRsvps')}
             </button>
           )}
         </div>
@@ -181,12 +181,12 @@ function EventCard({ event, isAdmin }: { event: EventDto; isAdmin: boolean }) {
             {rsvpsQuery.isLoading ? (
               <LoadingState />
             ) : rsvpsQuery.data && rsvpsQuery.data.length === 0 ? (
-              <p className="text-xs text-slate-400">No responses yet.</p>
+              <p className="text-xs text-slate-400">{t('events.noResponsesYet')}</p>
             ) : (
               rsvpsQuery.data?.map((r) => (
                 <div key={r.id} className="flex items-center justify-between text-xs">
                   <span className="text-slate-700">{r.userName}</span>
-                  <Badge tone={RSVP_TONE[r.status]}>{RSVP_LABEL[r.status]}</Badge>
+                  <Badge tone={RSVP_TONE[r.status]}>{rsvpLabel(t, r.status)}</Badge>
                 </div>
               ))
             )}
@@ -212,6 +212,7 @@ function MonthCalendar({
   onSelectDate: (date: string | null) => void;
   isAdmin: boolean;
 }) {
+  const { t } = useTranslation();
   const displayedMonth = useMemo(() => {
     const d = new Date();
     d.setDate(1);
@@ -251,7 +252,7 @@ function MonthCalendar({
           onClick={() => onMonthOffsetChange(monthOffset - 1)}
           className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
         >
-          ← Prev
+          {t('events.prev')}
         </button>
         <h3 className="text-sm font-bold text-slate-900">
           {displayedMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
@@ -260,7 +261,7 @@ function MonthCalendar({
           onClick={() => onMonthOffsetChange(monthOffset + 1)}
           className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
         >
-          Next →
+          {t('events.next')}
         </button>
       </div>
 
@@ -285,7 +286,7 @@ function MonthCalendar({
               <span className="font-semibold text-slate-700">{day}</span>
               {dayEvents.length > 0 && (
                 <span className="mt-1 truncate rounded bg-brand-100 px-1 py-0.5 text-[10px] text-brand-700">
-                  {dayEvents.length} event{dayEvents.length > 1 ? 's' : ''}
+                  {t(dayEvents.length === 1 ? 'events.eventCount_one' : 'events.eventCount_other', { count: dayEvents.length })}
                 </span>
               )}
             </button>
@@ -297,7 +298,7 @@ function MonthCalendar({
         <div className="mt-6">
           <h4 className="mb-2 text-sm font-semibold text-slate-700">{formatDate(selectedDate)}</h4>
           {selectedEvents.length === 0 ? (
-            <p className="text-sm text-slate-400">No events on this day.</p>
+            <p className="text-sm text-slate-400">{t('events.noEventsOnDay')}</p>
           ) : (
             <div className="space-y-3">
               {selectedEvents.map((event) => (
@@ -312,6 +313,7 @@ function MonthCalendar({
 }
 
 function CreateEventModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -342,14 +344,14 @@ function CreateEventModal({ open, onClose }: { open: boolean; onClose: () => voi
     <Modal
       open={open}
       onClose={onClose}
-      title="Add event"
+      title={t('events.addEventModal')}
       footer={
         <>
           <Button variant="secondary" type="button" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" form="event-form" loading={mutation.isPending}>
-            Create
+            {t('events.create')}
           </Button>
         </>
       }
@@ -360,10 +362,10 @@ function CreateEventModal({ open, onClose }: { open: boolean; onClose: () => voi
             {error}
           </div>
         )}
-        <Input label="Title" required value={title} onChange={(e) => setTitle(e.target.value)} />
-        <Input label="Date" type="date" required value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
-        <Input label="Location (optional)" value={location} onChange={(e) => setLocation(e.target.value)} />
-        <Textarea label="Description (optional)" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+        <Input label={t('events.title')} required value={title} onChange={(e) => setTitle(e.target.value)} />
+        <Input label={t('events.date2')} type="date" required value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
+        <Input label={t('events.locationOptional')} value={location} onChange={(e) => setLocation(e.target.value)} />
+        <Textarea label={t('events.descriptionOptional')} rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
       </form>
     </Modal>
   );

@@ -1,5 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { studentsApi } from '@/api/students';
 import { homeworkSubmissionsApi } from '@/api/homeworkSubmissions';
 import { extractErrorMessage } from '@/api/client';
@@ -51,6 +52,7 @@ function ChildSubmissionRow({
   studentId: string;
   studentName: string;
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -85,12 +87,12 @@ function ChildSubmissionRow({
       {submission ? (
         <div className="flex items-center gap-3">
           <HomeworkSubmissionBadge status={submission.status} />
-          {submission.grade && <span className="text-slate-600">Grade: {submission.grade}</span>}
+          {submission.grade && <span className="text-slate-600">{t('homeworkSubmissions.grade')}: {submission.grade}</span>}
           <button
             className="font-medium text-brand-600 hover:text-brand-700"
             onClick={() => downloadMutation.mutate(submission)}
           >
-            View file
+            {t('homeworkSubmissions.viewFile')}
           </button>
         </div>
       ) : (
@@ -113,6 +115,7 @@ function ChildSubmissionRow({
 
 /** For a TEACHER: expandable list of submissions for a homework item, with grading. */
 export function TeacherSubmissionsPanel({ homeworkId }: { homeworkId: string }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   return (
@@ -121,7 +124,7 @@ export function TeacherSubmissionsPanel({ homeworkId }: { homeworkId: string }) 
         className="text-sm font-medium text-brand-600 hover:text-brand-700"
         onClick={() => setOpen((v) => !v)}
       >
-        {open ? 'Hide submissions' : 'View submissions'}
+        {open ? t('homeworkSubmissions.hideSubmissions') : t('homeworkSubmissions.viewSubmissions')}
       </button>
       {open && <SubmissionsList homeworkId={homeworkId} />}
     </div>
@@ -129,6 +132,7 @@ export function TeacherSubmissionsPanel({ homeworkId }: { homeworkId: string }) 
 }
 
 function SubmissionsList({ homeworkId }: { homeworkId: string }) {
+  const { t } = useTranslation();
   const query = useQuery({
     queryKey: ['homework-submissions-by-hw', homeworkId],
     queryFn: () => homeworkSubmissionsApi.byHomework(homeworkId),
@@ -140,9 +144,9 @@ function SubmissionsList({ homeworkId }: { homeworkId: string }) {
   });
 
   if (query.isLoading) return <LoadingState />;
-  if (query.isError) return <p className="mt-2 text-sm text-red-600">Could not load submissions.</p>;
+  if (query.isError) return <p className="mt-2 text-sm text-red-600">{t('homeworkSubmissions.couldNotLoad')}</p>;
   if (!query.data || query.data.length === 0) {
-    return <p className="mt-2 text-sm text-slate-500">No submissions yet.</p>;
+    return <p className="mt-2 text-sm text-slate-500">{t('homeworkSubmissions.noSubmissionsYet')}</p>;
   }
 
   return (
@@ -165,6 +169,7 @@ function SubmissionRow({
   submission: HomeworkSubmissionDto;
   onDownload: () => void;
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [grading, setGrading] = useState(false);
   const [grade, setGrade] = useState(submission.grade ?? '');
@@ -197,17 +202,17 @@ function SubmissionRow({
         </div>
         <div className="flex items-center gap-3 text-sm">
           <button className="font-medium text-brand-600 hover:text-brand-700" onClick={onDownload}>
-            View file
+            {t('homeworkSubmissions.viewFile')}
           </button>
           <button className="font-medium text-brand-600 hover:text-brand-700" onClick={() => setGrading((v) => !v)}>
-            {submission.status === 'GRADED' ? 'Edit grade' : 'Grade'}
+            {submission.status === 'GRADED' ? t('homeworkSubmissions.editGrade') : t('homeworkSubmissions.grade')}
           </button>
         </div>
       </div>
 
       {submission.status === 'GRADED' && !grading && (
         <p className="mt-2 text-sm text-slate-600">
-          Grade: <span className="font-medium">{submission.grade}</span>
+          {t('homeworkSubmissions.grade')}: <span className="font-medium">{submission.grade}</span>
           {submission.teacherFeedback && <> — {submission.teacherFeedback}</>}
         </p>
       )}
@@ -217,7 +222,7 @@ function SubmissionRow({
           {error && <p className="text-xs font-medium text-red-600">{error}</p>}
           <div className="flex items-end gap-3">
             <div className="w-24">
-              <label className="mb-1 block text-xs font-medium text-slate-600">Grade</label>
+              <label className="mb-1 block text-xs font-medium text-slate-600">{t('homeworkSubmissions.grade')}</label>
               <input
                 required
                 value={grade}
@@ -226,11 +231,11 @@ function SubmissionRow({
               />
             </div>
             <Button type="submit" loading={mutation.isPending}>
-              Save
+              {t('homeworkSubmissions.save')}
             </Button>
           </div>
           <Textarea
-            label="Feedback"
+            label={t('homeworkSubmissions.feedback')}
             rows={2}
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
@@ -242,9 +247,10 @@ function SubmissionRow({
 }
 
 function StudentLabel({ studentId }: { studentId: string }) {
+  const { t } = useTranslation();
   const query = useQuery({
     queryKey: ['student', studentId],
     queryFn: () => studentsApi.getById(studentId),
   });
-  return <span className="font-medium text-slate-800">{query.data?.name ?? 'Student'}</span>;
+  return <span className="font-medium text-slate-800">{query.data?.name ?? t('homeworkSubmissions.student')}</span>;
 }

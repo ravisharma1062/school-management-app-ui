@@ -68,7 +68,7 @@ export function TimetablePage() {
         title={t('pages.timetable.title')}
         description={t('pages.timetable.description')}
         action={
-          isAdmin && ready ? <Button onClick={() => setModalOpen(true)}>+ Add entry</Button> : undefined
+          isAdmin && ready ? <Button onClick={() => setModalOpen(true)}>{t('timetable.addEntry')}</Button> : undefined
         }
       />
 
@@ -83,7 +83,7 @@ export function TimetablePage() {
                 onChange={(e) => setIncludeArchived(e.target.checked)}
                 className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
               />
-              Show archived
+              {t('common.showArchived')}
             </label>
           )}
         </div>
@@ -96,15 +96,15 @@ export function TimetablePage() {
       )}
 
       {!ready ? (
-        <EmptyState title="Select a class and section" message="Choose above to view the timetable." />
+        <EmptyState title={t('timetable.selectClassSection')} message={t('timetable.chooseAboveToView')} />
       ) : query.isLoading ? (
         <LoadingState />
       ) : query.isError ? (
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : periods.length === 0 ? (
         <EmptyState
-          title="No timetable entries"
-          message={isAdmin ? 'Add the first entry for this class.' : 'No timetable has been set for this class yet.'}
+          title={t('timetable.noEntries')}
+          message={isAdmin ? t('timetable.addFirstEntry') : t('timetable.noTimetableSet')}
         />
       ) : (
         <Card>
@@ -113,7 +113,7 @@ export function TimetablePage() {
               <thead>
                 <tr className="bg-gradient-to-r from-brand-50/80 to-accent-50/60">
                   <th className="border border-slate-100 px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wider text-brand-800/70">
-                    Period
+                    {t('timetable.period')}
                   </th>
                   {WEEK.map((d) => (
                     <th
@@ -142,11 +142,11 @@ export function TimetablePage() {
                               }`}
                             >
                               {entry.subject}
-                              {!entry.active && <span className="text-[10px] uppercase">Archived</span>}
+                              {!entry.active && <span className="text-[10px] uppercase">{t('common.archived')}</span>}
                               {isAdmin && (
                                 <button
                                   type="button"
-                                  title={entry.active ? 'Archive' : 'Restore'}
+                                  title={entry.active ? t('common.archive') : t('common.restore')}
                                   disabled={archiveMutation.isPending && archiveMutation.variables?.id === entry.id}
                                   onClick={() => archiveMutation.mutate({ id: entry.id, active: entry.active })}
                                   className="ml-0.5 rounded-full px-1 text-current hover:bg-black/10 disabled:opacity-50"
@@ -200,6 +200,7 @@ function AddTimetableModal({
   onClose: () => void;
   defaults: ClassSection;
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<TimetableCreateRequest>({
     studentClass: defaults.studentClass,
@@ -236,14 +237,14 @@ function AddTimetableModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="Add timetable entry"
+      title={t('timetable.addTimetableEntry')}
       footer={
         <>
           <Button variant="secondary" type="button" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" form="tt-form" loading={mutation.isPending}>
-            Add entry
+            {t('timetable.add')}
           </Button>
         </>
       }
@@ -255,11 +256,11 @@ function AddTimetableModal({
           </div>
         )}
         <p className="text-sm text-slate-500">
-          Class <span className="font-medium text-slate-700">{defaults.studentClass}-{defaults.section}</span>
+          {t('timetable.classPrefix')} <span className="font-medium text-slate-700">{defaults.studentClass}-{defaults.section}</span>
         </p>
         <div className="grid grid-cols-2 gap-4">
           <Select
-            label="Day"
+            label={t('timetable.day')}
             value={form.dayOfWeek}
             onChange={(e) => setForm({ ...form, dayOfWeek: e.target.value as DayOfWeek })}
           >
@@ -270,7 +271,7 @@ function AddTimetableModal({
             ))}
           </Select>
           <Input
-            label="Period"
+            label={t('timetable.period')}
             type="number"
             min={1}
             max={12}
@@ -280,18 +281,18 @@ function AddTimetableModal({
           />
         </div>
         <Input
-          label="Subject"
+          label={t('timetable.subject')}
           required
           value={form.subject}
           onChange={(e) => setForm({ ...form, subject: e.target.value })}
         />
         <Select
-          label="Teacher"
+          label={t('timetable.teacher')}
           required
           value={form.teacherId}
           onChange={(e) => setForm({ ...form, teacherId: e.target.value })}
         >
-          <option value="">— Select teacher —</option>
+          <option value="">{t('timetable.selectTeacher')}</option>
           {teachersQuery.data?.content.map((t) => (
             <option key={t.id} value={t.id}>
               {t.name}

@@ -49,7 +49,7 @@ export function HomeworkPage() {
         title={t('pages.homework.title')}
         description={t('pages.homework.description')}
         action={
-          isTeacher && ready ? <Button onClick={() => setModalOpen(true)}>+ Post homework</Button> : undefined
+          isTeacher && ready ? <Button onClick={() => setModalOpen(true)}>{t('homework.postHomework')}</Button> : undefined
         }
       />
 
@@ -66,15 +66,15 @@ export function HomeworkPage() {
       </Card>
 
       {!ready ? (
-        <EmptyState title="Select a class and section" message="Choose above to view homework." />
+        <EmptyState title={t('homework.selectClassSection')} message={t('homework.chooseAboveToView')} />
       ) : query.isLoading ? (
         <LoadingState />
       ) : query.isError ? (
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : query.data && query.data.content.length === 0 ? (
         <EmptyState
-          title="No homework"
-          message={isTeacher ? 'Post the first assignment for this class.' : 'No homework has been posted yet.'}
+          title={t('homework.noHomework')}
+          message={isTeacher ? t('homework.postFirstAssignment') : t('homework.noHomeworkPosted')}
         />
       ) : (
         query.data && (
@@ -91,7 +91,7 @@ export function HomeworkPage() {
                       {hw.description && <p className="mt-1 text-sm text-slate-600">{hw.description}</p>}
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="text-xs uppercase tracking-wide text-slate-400">Due</p>
+                      <p className="text-xs uppercase tracking-wide text-slate-400">{t('homework.due')}</p>
                       <p className="text-sm font-medium text-slate-700">{formatDate(hw.dueDate)}</p>
                     </div>
                   </div>
@@ -126,6 +126,7 @@ function PostHomeworkModal({
   onClose: () => void;
   defaults: ClassSection;
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<Omit<HomeworkCreateRequest, 'studentClass' | 'section'>>({
     subject: '',
@@ -159,14 +160,14 @@ function PostHomeworkModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="Post homework"
+      title={t('homework.postHomeworkModal')}
       footer={
         <>
           <Button variant="secondary" type="button" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" form="hw-form" loading={mutation.isPending}>
-            Post
+            {t('homework.post')}
           </Button>
         </>
       }
@@ -178,17 +179,17 @@ function PostHomeworkModal({
           </div>
         )}
         <p className="text-sm text-slate-500">
-          Class <span className="font-medium text-slate-700">{defaults.studentClass}-{defaults.section}</span>
+          {t('homework.classPrefix')} <span className="font-medium text-slate-700">{defaults.studentClass}-{defaults.section}</span>
         </p>
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Subject"
+            label={t('homework.subject')}
             required
             value={form.subject}
             onChange={(e) => setForm({ ...form, subject: e.target.value })}
           />
           <Input
-            label="Due date"
+            label={t('homework.dueDate')}
             type="date"
             required
             value={form.dueDate}
@@ -196,13 +197,13 @@ function PostHomeworkModal({
           />
         </div>
         <Input
-          label="Title"
+          label={t('homework.title')}
           required
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
         />
         <Textarea
-          label="Description"
+          label={t('homework.description')}
           rows={4}
           value={form.description ?? ''}
           onChange={(e) => setForm({ ...form, description: e.target.value })}

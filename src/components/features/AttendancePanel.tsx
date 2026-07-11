@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { attendanceApi } from '@/api/attendance';
 import { formatDate } from '@/lib/format';
 import {
@@ -23,6 +24,7 @@ function percentage(records: AttendanceDto[]): number {
 }
 
 export function AttendancePanel({ studentId }: { studentId: string }) {
+  const { t } = useTranslation();
   const query = useQuery({
     queryKey: ['attendance', 'student', studentId],
     queryFn: () => attendanceApi.byStudent(studentId),
@@ -33,25 +35,25 @@ export function AttendancePanel({ studentId }: { studentId: string }) {
   if (query.isLoading) return <LoadingState />;
   if (query.isError) return <ErrorState error={query.error} onRetry={() => query.refetch()} />;
   if (!query.data || query.data.length === 0)
-    return <EmptyState title="No attendance records" message="Attendance has not been marked for this student yet." />;
+    return <EmptyState title={t('attendancePanel.noAttendanceRecords')} message={t('attendancePanel.notMarkedYet')} />;
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-6 rounded-2xl bg-gradient-to-r from-brand-50 to-accent-50/60 px-5 py-4 ring-1 ring-inset ring-brand-100">
         <div>
           <p className="text-gradient text-2xl font-extrabold">{pct.toFixed(1)}%</p>
-          <p className="text-xs font-medium text-slate-500">Attendance (present + late)</p>
+          <p className="text-xs font-medium text-slate-500">{t('attendancePanel.presentLate')}</p>
         </div>
         <div>
           <p className="text-2xl font-extrabold text-slate-900">{query.data.length}</p>
-          <p className="text-xs font-medium text-slate-500">Days recorded</p>
+          <p className="text-xs font-medium text-slate-500">{t('attendancePanel.daysRecorded')}</p>
         </div>
       </div>
       <Table>
         <THead>
           <TR>
-            <TH>Date</TH>
-            <TH>Status</TH>
+            <TH>{t('attendancePanel.date')}</TH>
+            <TH>{t('attendancePanel.status')}</TH>
           </TR>
         </THead>
         <TBody>

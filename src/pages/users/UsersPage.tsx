@@ -51,12 +51,12 @@ export function UsersPage() {
       <PageHeader
         title={t('pages.users.title')}
         description={t('pages.users.description')}
-        action={<Button onClick={() => setModalOpen(true)}>+ Add user</Button>}
+        action={<Button onClick={() => setModalOpen(true)}>{t('users.addUser')}</Button>}
       />
 
       <div className="mb-4 flex items-center gap-3">
         <label htmlFor="role-filter" className="text-sm text-slate-600">
-          Filter by role
+          {t('users.filterByRole')}
         </label>
         <div className="w-48">
           <Select
@@ -67,7 +67,7 @@ export function UsersPage() {
               setPage(0);
             }}
           >
-            <option value="">All roles</option>
+            <option value="">{t('users.allRoles')}</option>
             {ROLES.map((r) => (
               <option key={r} value={r}>
                 {r}
@@ -82,17 +82,17 @@ export function UsersPage() {
       ) : query.isError ? (
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : query.data && query.data.content.length === 0 ? (
-        <EmptyState title="No users found" message="Try a different filter or add a new user." />
+        <EmptyState title={t('users.noUsersFound')} message={t('users.tryDifferentFilter')} />
       ) : (
         query.data && (
           <Card>
             <Table>
               <THead>
                 <TR>
-                  <TH>Name</TH>
-                  <TH>Email</TH>
-                  <TH>Role</TH>
-                  <TH>Phone</TH>
+                  <TH>{t('users.nameCol')}</TH>
+                  <TH>{t('users.emailCol')}</TH>
+                  <TH>{t('users.roleCol')}</TH>
+                  <TH>{t('users.phoneCol')}</TH>
                 </TR>
               </THead>
               <TBody>
@@ -134,6 +134,7 @@ const emptyUser: UserCreateRequest = {
 };
 
 function CreateUserModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<UserCreateRequest>(emptyUser);
   const [error, setError] = useState<string | null>(null);
@@ -158,14 +159,14 @@ function CreateUserModal({ open, onClose }: { open: boolean; onClose: () => void
     <Modal
       open={open}
       onClose={onClose}
-      title="Add user"
+      title={t('users.addUserModal')}
       footer={
         <>
           <Button variant="secondary" type="button" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" form="user-form" loading={mutation.isPending}>
-            Create user
+            {t('users.createUser')}
           </Button>
         </>
       }
@@ -177,21 +178,21 @@ function CreateUserModal({ open, onClose }: { open: boolean; onClose: () => void
           </div>
         )}
         <Input
-          label="Full name"
+          label={t('users.fullName')}
           required
           maxLength={150}
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
         />
         <Input
-          label="Email"
+          label={t('users.email')}
           type="email"
           required
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
         />
         <Input
-          label="Password"
+          label={t('users.password')}
           type="password"
           required
           minLength={8}
@@ -201,7 +202,7 @@ function CreateUserModal({ open, onClose }: { open: boolean; onClose: () => void
         />
         <div className="grid grid-cols-2 gap-4">
           <Select
-            label="Role"
+            label={t('users.role')}
             required
             value={form.role}
             onChange={(e) => setForm({ ...form, role: e.target.value as Role })}
@@ -213,13 +214,13 @@ function CreateUserModal({ open, onClose }: { open: boolean; onClose: () => void
             ))}
           </Select>
           <Input
-            label="Phone"
+            label={t('users.phone')}
             maxLength={20}
             value={form.phone ?? ''}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
           />
         </div>
-        <p className="text-xs text-slate-500">Password must be at least 8 characters.</p>
+        <p className="text-xs text-slate-500">{t('users.passwordHint')}</p>
       </form>
     </Modal>
   );

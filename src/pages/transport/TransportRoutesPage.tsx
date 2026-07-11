@@ -33,7 +33,7 @@ export function TransportRoutesPage() {
       <PageHeader
         title={t('pages.busRoutes.title')}
         description={t('pages.busRoutes.description')}
-        action={<Button onClick={() => setCreateOpen(true)}>+ Add route</Button>}
+        action={<Button onClick={() => setCreateOpen(true)}>{t('transport.addRoute')}</Button>}
       />
 
       {query.isLoading ? (
@@ -41,7 +41,7 @@ export function TransportRoutesPage() {
       ) : query.isError ? (
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : query.data && query.data.length === 0 ? (
-        <EmptyState title="No routes yet" message="Add a bus route to get started." />
+        <EmptyState title={t('transport.noRoutesYet')} message={t('transport.addRouteToStart')} />
       ) : (
         <div className="space-y-3">
           {query.data?.map((route) => (
@@ -55,7 +55,7 @@ export function TransportRoutesPage() {
                     <h3 className="font-semibold text-slate-900">{route.name}</h3>
                     {route.description && <p className="text-sm text-slate-500">{route.description}</p>}
                   </div>
-                  <span className="text-xs font-medium text-slate-400">{route.stopCount} stops</span>
+                  <span className="text-xs font-medium text-slate-400">{route.stopCount} {t('transport.stops')}</span>
                 </button>
                 {selectedId === route.id && <RouteDetail routeId={route.id} />}
               </CardBody>
@@ -70,6 +70,7 @@ export function TransportRoutesPage() {
 }
 
 function RouteDetail({ routeId }: { routeId: string }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const query = useQuery({
     queryKey: ['transport-route', routeId],
@@ -89,7 +90,7 @@ function RouteDetail({ routeId }: { routeId: string }) {
     <div className="mt-4 space-y-4 border-t border-slate-100 pt-4">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Device location token — configure the bus's GPS device/app with this
+          {t('transport.deviceTokenLabel')}
         </p>
         <div className="mt-1 flex items-center gap-2">
           <code className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs text-slate-700">{query.data.locationToken}</code>
@@ -101,7 +102,7 @@ function RouteDetail({ routeId }: { routeId: string }) {
               setTimeout(() => setCopied(false), 1500);
             }}
           >
-            {copied ? 'Copied!' : 'Copy'}
+            {copied ? t('transport.copied') : t('transport.copy')}
           </button>
         </div>
       </div>
@@ -111,6 +112,7 @@ function RouteDetail({ routeId }: { routeId: string }) {
 }
 
 function CreateRouteModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -151,14 +153,14 @@ function CreateRouteModal({ open, onClose }: { open: boolean; onClose: () => voi
     <Modal
       open={open}
       onClose={onClose}
-      title="Add bus route"
+      title={t('transport.addRouteModal')}
       footer={
         <>
           <Button variant="secondary" type="button" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" form="route-form" loading={mutation.isPending}>
-            Create
+            {t('transport.create')}
           </Button>
         </>
       }
@@ -169,14 +171,14 @@ function CreateRouteModal({ open, onClose }: { open: boolean; onClose: () => voi
             {error}
           </div>
         )}
-        <Input label="Route name" required value={name} onChange={(e) => setName(e.target.value)} />
-        <Textarea label="Description (optional)" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
+        <Input label={t('transport.routeName')} required value={name} onChange={(e) => setName(e.target.value)} />
+        <Textarea label={t('transport.descriptionOptional')} rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
 
         <div>
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-sm font-medium text-slate-700">Stops (in order)</p>
+            <p className="text-sm font-medium text-slate-700">{t('transport.stopsInOrder')}</p>
             <button type="button" className="text-xs font-medium text-brand-600 hover:text-brand-700" onClick={addStop}>
-              + Add stop
+              {t('transport.addStop')}
             </button>
           </div>
           <div className="space-y-2">
@@ -184,14 +186,14 @@ function CreateRouteModal({ open, onClose }: { open: boolean; onClose: () => voi
               <div key={i} className="grid grid-cols-12 gap-2">
                 <input
                   className="col-span-5 rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm"
-                  placeholder="Stop name"
+                  placeholder={t('transport.stopNamePlaceholder')}
                   required
                   value={stop.name}
                   onChange={(e) => updateStop(i, { name: e.target.value })}
                 />
                 <input
                   className="col-span-3 rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm"
-                  placeholder="Latitude"
+                  placeholder={t('transport.latitudePlaceholder')}
                   type="number"
                   step="any"
                   required
@@ -200,7 +202,7 @@ function CreateRouteModal({ open, onClose }: { open: boolean; onClose: () => voi
                 />
                 <input
                   className="col-span-3 rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm"
-                  placeholder="Longitude"
+                  placeholder={t('transport.longitudePlaceholder')}
                   type="number"
                   step="any"
                   required

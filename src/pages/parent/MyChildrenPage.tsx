@@ -22,8 +22,8 @@ export function MyChildrenPage() {
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : !query.data || query.data.length === 0 ? (
         <EmptyState
-          title="No children linked"
-          message="No students are linked to your account yet. Please contact the school administrator."
+          title={t('myChildren.noChildrenLinked')}
+          message={t('myChildren.contactAdmin')}
         />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -33,9 +33,9 @@ export function MyChildrenPage() {
                 <CardBody>
                   <p className="text-base font-semibold text-slate-900">{child.name}</p>
                   <p className="mt-1 text-sm text-slate-500">
-                    Class {child.studentClass}-{child.section} · Roll {child.rollNo}
+                    {t('myChildren.classPrefix')} {child.studentClass}-{child.section} · {t('myChildren.roll')} {child.rollNo}
                   </p>
-                  <p className="mt-1 text-xs text-slate-400">Born {formatDate(child.dob)}</p>
+                  <p className="mt-1 text-xs text-slate-400">{t('myChildren.born')} {formatDate(child.dob)}</p>
                 </CardBody>
               </Card>
             </Link>

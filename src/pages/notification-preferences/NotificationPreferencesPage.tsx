@@ -15,16 +15,7 @@ import {
   THead,
   TR,
 } from '@/components/ui';
-import type { NotificationEventType, NotificationPreferenceDto } from '@/types';
-
-const EVENT_LABEL: Record<NotificationEventType, string> = {
-  ATTENDANCE_ABSENT: 'Student marked absent',
-  FEE_OVERDUE: 'Fee becomes overdue',
-  NOTICE_CREATED: 'New notice posted',
-  EXAM_RESULT_PUBLISHED: 'Exam result published',
-  USER_WELCOME: 'New account created (welcome email)',
-  MESSAGE_RECEIVED: 'New message received',
-};
+import type { NotificationPreferenceDto } from '@/types';
 
 export function NotificationPreferencesPage() {
   const { t } = useTranslation();
@@ -76,15 +67,15 @@ export function NotificationPreferencesPage() {
             <Table>
               <THead>
                 <TR>
-                  <TH>Event</TH>
-                  <TH className="text-center">SMS</TH>
-                  <TH className="text-center">Email</TH>
+                  <TH>{t('notificationPreferences.event')}</TH>
+                  <TH className="text-center">{t('notificationPreferences.sms')}</TH>
+                  <TH className="text-center">{t('notificationPreferences.email')}</TH>
                 </TR>
               </THead>
               <TBody>
                 {query.data.map((pref) => (
                   <TR key={pref.eventType}>
-                    <TD className="font-medium text-slate-900">{EVENT_LABEL[pref.eventType]}</TD>
+                    <TD className="font-medium text-slate-900">{t(`notificationPreferences.${pref.eventType}`)}</TD>
                     <TD className="text-center">
                       <input
                         type="checkbox"

@@ -63,12 +63,12 @@ export function NoticesPage() {
       <PageHeader
         title={t('pages.notices.title')}
         description={t('pages.notices.description')}
-        action={isAdmin ? <Button onClick={() => setModalOpen(true)}>+ Post notice</Button> : undefined}
+        action={isAdmin ? <Button onClick={() => setModalOpen(true)}>{t('notices.postNotice')}</Button> : undefined}
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <label htmlFor="notice-filter" className="text-sm text-slate-600">
-          Audience
+          {t('notices.audience')}
         </label>
         <div className="w-48">
           <Select
@@ -79,7 +79,7 @@ export function NoticesPage() {
               setPage(0);
             }}
           >
-            <option value="">All visible</option>
+            <option value="">{t('notices.allVisible')}</option>
             {TARGET_ROLES.map((r) => (
               <option key={r} value={r}>
                 {r}
@@ -98,7 +98,7 @@ export function NoticesPage() {
               }}
               className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
             />
-            Show archived
+            {t('common.showArchived')}
           </label>
         )}
       </div>
@@ -114,7 +114,7 @@ export function NoticesPage() {
       ) : query.isError ? (
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : query.data && query.data.content.length === 0 ? (
-        <EmptyState title="No notices" message="There are no announcements to show." />
+        <EmptyState title={t('notices.noNotices')} message={t('notices.noAnnouncements')} />
       ) : (
         query.data && (
           <div className="space-y-3">
@@ -126,7 +126,7 @@ export function NoticesPage() {
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold text-slate-900">{n.title}</h3>
                         <Badge tone="purple">{n.targetRole}</Badge>
-                        {!n.active && <Badge tone="gray">Archived</Badge>}
+                        {!n.active && <Badge tone="gray">{t('common.archived')}</Badge>}
                       </div>
                       {n.description && <p className="mt-1 text-sm text-slate-600">{n.description}</p>}
                     </div>
@@ -139,7 +139,7 @@ export function NoticesPage() {
                           loading={archiveMutation.isPending && archiveMutation.variables?.id === n.id}
                           onClick={() => archiveMutation.mutate({ id: n.id, active: n.active })}
                         >
-                          {n.active ? 'Archive' : 'Restore'}
+                          {n.active ? t('common.archive') : t('common.restore')}
                         </Button>
                       )}
                     </div>
@@ -165,6 +165,7 @@ export function NoticesPage() {
 const emptyNotice: NoticeCreateRequest = { title: '', description: '', targetRole: 'ALL' };
 
 function PostNoticeModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<NoticeCreateRequest>(emptyNotice);
   const [error, setError] = useState<string | null>(null);
@@ -189,14 +190,14 @@ function PostNoticeModal({ open, onClose }: { open: boolean; onClose: () => void
     <Modal
       open={open}
       onClose={onClose}
-      title="Post notice"
+      title={t('notices.postNoticeModal')}
       footer={
         <>
           <Button variant="secondary" type="button" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" form="notice-form" loading={mutation.isPending}>
-            Post notice
+            {t('notices.postAction')}
           </Button>
         </>
       }
@@ -208,13 +209,13 @@ function PostNoticeModal({ open, onClose }: { open: boolean; onClose: () => void
           </div>
         )}
         <Input
-          label="Title"
+          label={t('notices.title')}
           required
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
         />
         <Select
-          label="Audience"
+          label={t('notices.audience')}
           required
           value={form.targetRole}
           onChange={(e) => setForm({ ...form, targetRole: e.target.value as TargetRole })}
@@ -226,7 +227,7 @@ function PostNoticeModal({ open, onClose }: { open: boolean; onClose: () => void
           ))}
         </Select>
         <Textarea
-          label="Description"
+          label={t('notices.description')}
           rows={4}
           value={form.description ?? ''}
           onChange={(e) => setForm({ ...form, description: e.target.value })}

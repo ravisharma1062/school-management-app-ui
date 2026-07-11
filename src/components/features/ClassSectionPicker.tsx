@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { studentsApi } from '@/api/students';
 import { useAuth } from '@/context/AuthContext';
 import { Input, Select } from '@/components/ui';
@@ -20,6 +21,7 @@ export function ClassSectionPicker({
   value: ClassSection;
   onChange: (v: ClassSection) => void;
 }) {
+  const { t } = useTranslation();
   const { role } = useAuth();
 
   const childrenQuery = useQuery({
@@ -38,17 +40,17 @@ export function ClassSectionPicker({
     return (
       <div className="w-64">
         <Select
-          label="Class / Section"
+          label={t('common.classSection')}
           value={options.some((o) => `${o.studentClass}|${o.section}` === current) ? current : ''}
           onChange={(e) => {
             const [studentClass, section] = e.target.value.split('|');
             onChange({ studentClass: studentClass ?? '', section: section ?? '' });
           }}
         >
-          <option value="">— Select —</option>
+          <option value="">{t('common.selectPlaceholder')}</option>
           {options.map((o) => (
             <option key={`${o.studentClass}|${o.section}`} value={`${o.studentClass}|${o.section}`}>
-              Class {o.studentClass}-{o.section}
+              {t('timetable.classPrefix')} {o.studentClass}-{o.section}
             </option>
           ))}
         </Select>
@@ -60,7 +62,7 @@ export function ClassSectionPicker({
     <div className="flex gap-3">
       <div className="w-32">
         <Input
-          label="Class"
+          label={t('common.class')}
           placeholder="e.g. 5"
           value={value.studentClass}
           onChange={(e) => onChange({ ...value, studentClass: e.target.value })}
@@ -68,7 +70,7 @@ export function ClassSectionPicker({
       </div>
       <div className="w-32">
         <Input
-          label="Section"
+          label={t('common.section')}
           placeholder="e.g. A"
           value={value.section}
           onChange={(e) => onChange({ ...value, section: e.target.value })}

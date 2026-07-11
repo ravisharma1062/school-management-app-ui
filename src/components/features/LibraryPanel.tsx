@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { libraryApi } from '@/api/library';
 import { extractErrorMessage } from '@/api/client';
 import { formatDate, formatMoney } from '@/lib/format';
 import { BookIssueBadge, Button, EmptyState, ErrorState, LoadingState, Table, TBody, TD, TH, THead, TR } from '@/components/ui';
 
 export function LibraryPanel({ studentId, canManage }: { studentId: string; canManage: boolean }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +28,7 @@ export function LibraryPanel({ studentId, canManage }: { studentId: string; canM
   if (query.isLoading) return <LoadingState />;
   if (query.isError) return <ErrorState error={query.error} onRetry={() => query.refetch()} />;
   if (!query.data || query.data.length === 0) {
-    return <EmptyState title="No books issued" message="This student has no library history yet." />;
+    return <EmptyState title={t('libraryPanel.noBooksIssued')} message={t('libraryPanel.noHistory')} />;
   }
 
   return (
@@ -35,13 +37,13 @@ export function LibraryPanel({ studentId, canManage }: { studentId: string; canM
       <Table>
         <THead>
           <TR>
-            <TH>Book</TH>
-            <TH>Issued</TH>
-            <TH>Due</TH>
-            <TH>Returned</TH>
-            <TH>Fine</TH>
-            <TH>Status</TH>
-            {canManage && <TH className="text-right">Actions</TH>}
+            <TH>{t('libraryPanel.bookCol')}</TH>
+            <TH>{t('libraryPanel.issuedCol')}</TH>
+            <TH>{t('libraryPanel.dueCol')}</TH>
+            <TH>{t('libraryPanel.returnedCol')}</TH>
+            <TH>{t('libraryPanel.fineCol')}</TH>
+            <TH>{t('libraryPanel.statusCol')}</TH>
+            {canManage && <TH className="text-right">{t('common.actions')}</TH>}
           </TR>
         </THead>
         <TBody>
@@ -63,7 +65,7 @@ export function LibraryPanel({ studentId, canManage }: { studentId: string; canM
                       loading={returnMutation.isPending && returnMutation.variables === issue.id}
                       onClick={() => returnMutation.mutate(issue.id)}
                     >
-                      Return
+                      {t('libraryPanel.returnAction')}
                     </Button>
                   )}
                 </TD>
