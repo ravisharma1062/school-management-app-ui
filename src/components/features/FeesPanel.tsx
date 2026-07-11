@@ -1,7 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { feesApi } from '@/api/fees';
+import { paymentsApi } from '@/api/payments';
 import { extractErrorMessage } from '@/api/client';
+import { openRazorpayCheckout } from '@/lib/razorpay';
+import { useAuth } from '@/context/AuthContext';
 import { FEE_STATUSES, formatDate, formatMoney } from '@/lib/format';
 import {
   Button,
@@ -23,10 +26,45 @@ import type { FeeDto, FeeStatus, FeeUpdateRequest } from '@/types';
 
 export function FeesPanel({ studentId, canEdit }: { studentId: string; canEdit: boolean }) {
   const [editing, setEditing] = useState<FeeDto | null>(null);
+  const { role, user } = useAuth();
+  const canPay = role === 'PARENT';
+  const [payingFeeId, setPayingFeeId] = useState<string | null>(null);
+  const [payError, setPayError] = useState<string | null>(null);
+  const [paySuccess, setPaySuccess] = useState(false);
+  const queryClient = useQueryClient();
+
   const query = useQuery({
     queryKey: ['fees', studentId],
     queryFn: () => feesApi.byStudent(studentId),
   });
+
+  async function handlePay(fee: FeeDto) {
+    setPayError(null);
+    setPaySuccess(false);
+    setPayingFeeId(fee.id);
+    try {
+      const order = await paymentsApi.initiate(fee.id);
+      await openRazorpayCheckout({
+        key: order.gatewayKeyId,
+        amount: order.amountInSmallestUnit,
+        currency: order.currency,
+        order_id: order.gatewayOrderId,
+        name: 'School Fee Payment',
+        description: `${fee.term} fee`,
+        prefill: { name: user?.name, email: user?.email },
+        theme: { color: '#4f46e5' },
+        handler: () => {
+          setPaySuccess(true);
+          queryClient.invalidateQueries({ queryKey: ['fees', studentId] });
+        },
+        modal: { ondismiss: () => setPayingFeeId(null) },
+      });
+    } catch (err) {
+      setPayError(extractErrorMessage(err, 'Online payments are not available right now. Please contact the school office.'));
+    } finally {
+      setPayingFeeId(null);
+    }
+  }
 
   if (query.isLoading) return <LoadingState />;
   if (query.isError) return <ErrorState error={query.error} onRetry={() => query.refetch()} />;
@@ -35,6 +73,7 @@ export function FeesPanel({ studentId, canEdit }: { studentId: string; canEdit: 
 
   const totalDue = query.data.reduce((sum, f) => sum + f.amountDue, 0);
   const totalPaid = query.data.reduce((sum, f) => sum + f.amountPaid, 0);
+  const showActions = canEdit || canPay;
 
   return (
     <div className="space-y-4">
@@ -48,6 +87,18 @@ export function FeesPanel({ studentId, canEdit }: { studentId: string; canEdit: 
           <p className="text-xs font-medium text-slate-500">Outstanding</p>
         </div>
       </div>
+
+      {payError && (
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm font-medium text-red-700">
+          {payError}
+        </div>
+      )}
+      {paySuccess && (
+        <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-sm font-medium text-emerald-700">
+          Payment submitted. It may take a few minutes to reflect here once confirmed.
+        </div>
+      )}
+
       <Table>
         <THead>
           <TR>
@@ -56,31 +107,45 @@ export function FeesPanel({ studentId, canEdit }: { studentId: string; canEdit: 
             <TH>Amount due</TH>
             <TH>Amount paid</TH>
             <TH>Status</TH>
-            {canEdit && <TH className="text-right">Actions</TH>}
+            {showActions && <TH className="text-right">Actions</TH>}
           </TR>
         </THead>
         <TBody>
-          {query.data.map((f) => (
-            <TR key={f.id}>
-              <TD>{f.term}</TD>
-              <TD>{formatDate(f.dueDate)}</TD>
-              <TD>{formatMoney(f.amountDue)}</TD>
-              <TD>{formatMoney(f.amountPaid)}</TD>
-              <TD>
-                <FeeBadge status={f.status} />
-              </TD>
-              {canEdit && (
-                <TD className="text-right">
-                  <button
-                    className="text-sm font-medium text-brand-600 hover:text-brand-700"
-                    onClick={() => setEditing(f)}
-                  >
-                    Update
-                  </button>
+          {query.data.map((f) => {
+            const outstanding = f.amountDue - f.amountPaid > 0 && f.status !== 'PAID';
+            return (
+              <TR key={f.id}>
+                <TD>{f.term}</TD>
+                <TD>{formatDate(f.dueDate)}</TD>
+                <TD>{formatMoney(f.amountDue)}</TD>
+                <TD>{formatMoney(f.amountPaid)}</TD>
+                <TD>
+                  <FeeBadge status={f.status} />
                 </TD>
-              )}
-            </TR>
-          ))}
+                {showActions && (
+                  <TD className="text-right space-x-3">
+                    {canEdit && (
+                      <button
+                        className="text-sm font-medium text-brand-600 hover:text-brand-700"
+                        onClick={() => setEditing(f)}
+                      >
+                        Update
+                      </button>
+                    )}
+                    {canPay && outstanding && (
+                      <button
+                        className="text-sm font-medium text-emerald-600 hover:text-emerald-700 disabled:opacity-50"
+                        disabled={payingFeeId === f.id}
+                        onClick={() => handlePay(f)}
+                      >
+                        {payingFeeId === f.id ? 'Opening…' : 'Pay Now'}
+                      </button>
+                    )}
+                  </TD>
+                )}
+              </TR>
+            );
+          })}
         </TBody>
       </Table>
 

@@ -12,6 +12,11 @@ import { AttendancePage } from '@/pages/attendance/AttendancePage';
 import { TimetablePage } from '@/pages/timetable/TimetablePage';
 import { HomeworkPage } from '@/pages/homework/HomeworkPage';
 import { NoticesPage } from '@/pages/notices/NoticesPage';
+import { LeaveRequestsPage } from '@/pages/leaverequests/LeaveRequestsPage';
+import { MessagesPage } from '@/pages/messages/MessagesPage';
+import { EventsPage } from '@/pages/events/EventsPage';
+import { AnalyticsDashboardPage } from '@/pages/analytics/AnalyticsDashboardPage';
+import { NotificationPreferencesPage } from '@/pages/notification-preferences/NotificationPreferencesPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export function App() {
@@ -30,6 +35,8 @@ export function App() {
           <Route path="/timetable" element={<TimetablePage />} />
           <Route path="/homework" element={<HomeworkPage />} />
           <Route path="/notices" element={<NoticesPage />} />
+          <Route path="/leave-requests" element={<LeaveRequestsPage />} />
+          <Route path="/events" element={<EventsPage />} />
 
           {/* Admin / Teacher */}
           <Route element={<RoleGuard allow={['ADMIN', 'TEACHER']} />}>
@@ -46,9 +53,16 @@ export function App() {
             <Route path="/children" element={<MyChildrenPage />} />
           </Route>
 
+          {/* Parent / Teacher */}
+          <Route element={<RoleGuard allow={['PARENT', 'TEACHER']} />}>
+            <Route path="/messages" element={<MessagesPage />} />
+          </Route>
+
           {/* Admin only */}
           <Route element={<RoleGuard allow={['ADMIN']} />}>
             <Route path="/users" element={<UsersPage />} />
+            <Route path="/notification-preferences" element={<NotificationPreferencesPage />} />
+            <Route path="/analytics" element={<AnalyticsDashboardPage />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />

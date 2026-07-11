@@ -15,7 +15,12 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/timetable', label: 'Timetable', roles: ['ADMIN', 'TEACHER', 'PARENT'], icon: '🗓️' },
   { to: '/homework', label: 'Homework', roles: ['ADMIN', 'TEACHER', 'PARENT'], icon: '📚' },
   { to: '/notices', label: 'Notices', roles: ['ADMIN', 'TEACHER', 'PARENT'], icon: '📢' },
+  { to: '/leave-requests', label: 'Leave Requests', roles: ['ADMIN', 'TEACHER', 'PARENT'], icon: '🏖️' },
+  { to: '/events', label: 'Events', roles: ['ADMIN', 'TEACHER', 'PARENT'], icon: '🎉' },
+  { to: '/messages', label: 'Messages', roles: ['TEACHER', 'PARENT'], icon: '💬' },
   { to: '/users', label: 'Users', roles: ['ADMIN'], icon: '👥' },
+  { to: '/notification-preferences', label: 'Notifications', roles: ['ADMIN'], icon: '🔔' },
+  { to: '/analytics', label: 'Analytics', roles: ['ADMIN'], icon: '📊' },
 ];
 
 export function navFor(role: Role): NavItem[] {

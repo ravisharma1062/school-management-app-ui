@@ -19,6 +19,7 @@ import {
   Textarea,
 } from '@/components/ui';
 import { ClassSectionPicker, type ClassSection } from '@/components/features/ClassSectionPicker';
+import { ParentSubmissionControl, TeacherSubmissionsPanel } from '@/components/features/HomeworkSubmissions';
 import type { HomeworkCreateRequest } from '@/types';
 
 const PAGE_SIZE = 10;
@@ -26,6 +27,7 @@ const PAGE_SIZE = 10;
 export function HomeworkPage() {
   const { role } = useAuth();
   const isTeacher = role === 'TEACHER';
+  const isParent = role === 'PARENT';
   const [cs, setCs] = useState<ClassSection>({ studentClass: '', section: '' });
   const [page, setPage] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
@@ -91,6 +93,8 @@ export function HomeworkPage() {
                       <p className="text-sm font-medium text-slate-700">{formatDate(hw.dueDate)}</p>
                     </div>
                   </div>
+                  {isParent && <ParentSubmissionControl homeworkId={hw.id} cs={cs} />}
+                  {isTeacher && <TeacherSubmissionsPanel homeworkId={hw.id} />}
                 </CardBody>
               </Card>
             ))}
