@@ -478,6 +478,7 @@ export interface BookDto {
   title: string;
   author: string;
   isbn?: string | null;
+  hasCoverImage: boolean;
   totalCopies: number;
   availableCopies: number;
 }

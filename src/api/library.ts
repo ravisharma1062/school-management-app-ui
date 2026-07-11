@@ -18,12 +18,26 @@ export const libraryApi = {
   },
 
   async returnBook(issueId: string): Promise<BookIssueDto> {
-    const { data } = await api.post<BookIssueDto>(`/library/issues/${issueId}/return`);
+    const { data } = await api.patch<BookIssueDto>(`/library/issues/${issueId}/return`);
     return data;
   },
 
   async getIssuesForStudent(studentId: string): Promise<BookIssueDto[]> {
     const { data } = await api.get<BookIssueDto[]>(`/library/students/${studentId}/issues`);
+    return data;
+  },
+
+  async uploadCover(bookId: string, file: File): Promise<BookDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const { data } = await api.post<BookDto>(`/library/books/${bookId}/cover`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data;
+  },
+
+  async downloadCover(bookId: string): Promise<Blob> {
+    const { data } = await api.get(`/library/books/${bookId}/cover`, { responseType: 'blob' });
     return data;
   },
 };

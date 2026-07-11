@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { libraryApi } from '@/api/library';
@@ -46,13 +46,13 @@ export function LibraryPage() {
       <PageHeader
         title={t('pages.library.title')}
         description={t('pages.library.description')}
-        action={isAdmin ? <Button onClick={() => setAddOpen(true)}>+ Add book</Button> : undefined}
+        action={isAdmin ? <Button onClick={() => setAddOpen(true)}>{t('library.addBook')}</Button> : undefined}
       />
 
       <div className="mb-4 w-64">
         <Input
-          label="Search"
-          placeholder="Title, author, or ISBN"
+          label={t('library.search')}
+          placeholder={t('library.searchPlaceholder')}
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -67,9 +67,9 @@ export function LibraryPage() {
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
       ) : query.data && query.data.content.length === 0 ? (
         <EmptyState
-          title="No books found"
-          message={isAdmin ? 'Add a book or adjust your search.' : 'No books match your search.'}
-          action={isAdmin ? <Button onClick={() => setAddOpen(true)}>+ Add book</Button> : undefined}
+          title={t('library.noBooksFound')}
+          message={isAdmin ? t('library.addBookOrAdjust') : t('library.noBooksMatch')}
+          action={isAdmin ? <Button onClick={() => setAddOpen(true)}>{t('library.addBook')}</Button> : undefined}
         />
       ) : (
         query.data && (
@@ -77,16 +77,20 @@ export function LibraryPage() {
             <Table>
               <THead>
                 <TR>
-                  <TH>Title</TH>
-                  <TH>Author</TH>
-                  <TH>ISBN</TH>
-                  <TH>Available</TH>
-                  {isAdmin && <TH className="text-right">Actions</TH>}
+                  <TH>{t('library.cover')}</TH>
+                  <TH>{t('library.titleCol')}</TH>
+                  <TH>{t('library.authorCol')}</TH>
+                  <TH>{t('library.isbnCol')}</TH>
+                  <TH>{t('library.availableCol')}</TH>
+                  {isAdmin && <TH className="text-right">{t('common.actions')}</TH>}
                 </TR>
               </THead>
               <TBody>
                 {query.data.content.map((book) => (
                   <TR key={book.id} className="hover:bg-slate-50">
+                    <TD>
+                      <BookCoverCell book={book} canUpload={isAdmin} />
+                    </TD>
                     <TD className="font-medium text-slate-900">{book.title}</TD>
                     <TD>{book.author}</TD>
                     <TD>{book.isbn || '—'}</TD>
@@ -100,7 +104,7 @@ export function LibraryPage() {
                           disabled={book.availableCopies <= 0}
                           onClick={() => setIssueBook(book)}
                         >
-                          Issue
+                          {t('library.issue')}
                         </button>
                       </TD>
                     )}
@@ -126,7 +130,72 @@ export function LibraryPage() {
   );
 }
 
+function BookCoverCell({ book, canUpload }: { book: BookDto; canUpload: boolean }) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!book.hasCoverImage) {
+      setCoverUrl(null);
+      return;
+    }
+    let cancelled = false;
+    let objectUrl: string | null = null;
+    libraryApi.downloadCover(book.id).then((blob) => {
+      if (cancelled) return;
+      objectUrl = URL.createObjectURL(blob);
+      setCoverUrl(objectUrl);
+    });
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [book.id, book.hasCoverImage]);
+
+  const uploadMutation = useMutation({
+    mutationFn: (file: File) => libraryApi.uploadCover(book.id, file),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['library-books'] }),
+  });
+
+  return (
+    <div className="flex items-center gap-2">
+      {coverUrl ? (
+        <img src={coverUrl} alt="" className="h-10 w-8 rounded object-cover ring-1 ring-slate-200" />
+      ) : (
+        <div className="flex h-10 w-8 items-center justify-center rounded bg-slate-100 text-slate-300 ring-1 ring-slate-200">
+          📖
+        </div>
+      )}
+      {canUpload && (
+        <>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) uploadMutation.mutate(file);
+            }}
+          />
+          <button
+            type="button"
+            className="text-xs font-medium text-brand-600 hover:text-brand-700 disabled:opacity-50"
+            disabled={uploadMutation.isPending}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {t('library.uploadCover')}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 function AddBookModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -158,14 +227,14 @@ function AddBookModal({ open, onClose }: { open: boolean; onClose: () => void })
     <Modal
       open={open}
       onClose={onClose}
-      title="Add book"
+      title={t('library.addBookModal')}
       footer={
         <>
           <Button variant="secondary" type="button" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" form="book-form" loading={mutation.isPending}>
-            Add
+            {t('common.add')}
           </Button>
         </>
       }
@@ -176,11 +245,11 @@ function AddBookModal({ open, onClose }: { open: boolean; onClose: () => void })
             {error}
           </div>
         )}
-        <Input label="Title" required value={title} onChange={(e) => setTitle(e.target.value)} />
-        <Input label="Author" required value={author} onChange={(e) => setAuthor(e.target.value)} />
-        <Input label="ISBN (optional)" value={isbn} onChange={(e) => setIsbn(e.target.value)} />
+        <Input label={t('library.title2')} required value={title} onChange={(e) => setTitle(e.target.value)} />
+        <Input label={t('library.author')} required value={author} onChange={(e) => setAuthor(e.target.value)} />
+        <Input label={t('library.isbnOptional')} value={isbn} onChange={(e) => setIsbn(e.target.value)} />
         <Input
-          label="Total copies"
+          label={t('library.totalCopies')}
           type="number"
           min={1}
           required
@@ -193,6 +262,7 @@ function AddBookModal({ open, onClose }: { open: boolean; onClose: () => void })
 }
 
 function IssueBookModal({ book, onClose }: { book: BookDto; onClose: () => void }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [nameSearch, setNameSearch] = useState('');
   const [studentId, setStudentId] = useState<string | null>(null);
@@ -218,14 +288,14 @@ function IssueBookModal({ book, onClose }: { book: BookDto; onClose: () => void 
     <Modal
       open
       onClose={onClose}
-      title={`Issue "${book.title}"`}
+      title={t('library.issueBookModal', { title: book.title })}
       footer={
         <>
           <Button variant="secondary" type="button" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button disabled={!studentId} loading={mutation.isPending} onClick={() => mutation.mutate()}>
-            Issue
+            {t('library.issue')}
           </Button>
         </>
       }
@@ -233,7 +303,7 @@ function IssueBookModal({ book, onClose }: { book: BookDto; onClose: () => void 
       <div className="space-y-3">
         {error && <p className="text-xs font-medium text-red-600">{error}</p>}
         <Input
-          label="Search student by name"
+          label={t('library.searchStudentByName')}
           value={nameSearch}
           onChange={(e) => {
             setNameSearch(e.target.value);
@@ -243,7 +313,7 @@ function IssueBookModal({ book, onClose }: { book: BookDto; onClose: () => void 
         {studentsQuery.data && (
           <div className="max-h-56 overflow-y-auto rounded-xl border border-slate-100">
             {studentsQuery.data.content.length === 0 ? (
-              <p className="px-3 py-2 text-sm text-slate-400">No students found.</p>
+              <p className="px-3 py-2 text-sm text-slate-400">{t('library.noStudentsFound')}</p>
             ) : (
               studentsQuery.data.content.map((s) => (
                 <button
