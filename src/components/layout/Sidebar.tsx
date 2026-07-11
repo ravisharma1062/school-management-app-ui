@@ -1,8 +1,10 @@
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { navFor } from './nav';
 import type { Role } from '@/types';
 
 export function Sidebar({ role, onNavigate }: { role: Role; onNavigate?: () => void }) {
+  const { t } = useTranslation();
   const items = navFor(role);
   return (
     <nav className="stagger flex flex-col gap-1.5 p-3" aria-label="Main navigation">
@@ -25,7 +27,7 @@ export function Sidebar({ role, onNavigate }: { role: Role; onNavigate?: () => v
           >
             {item.icon}
           </span>
-          {item.label}
+          {t(`nav.${item.labelKey}`)}
         </NavLink>
       ))}
     </nav>

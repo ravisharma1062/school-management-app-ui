@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { Page, PageParams, Role, UserCreateRequest, UserDto } from '@/types';
+import type { LanguageCode, Page, PageParams, Role, UserCreateRequest, UserDto } from '@/types';
 
 export const usersApi = {
   async list(params: PageParams & { role?: Role } = {}): Promise<Page<UserDto>> {
@@ -9,6 +9,11 @@ export const usersApi = {
 
   async create(payload: UserCreateRequest): Promise<UserDto> {
     const { data } = await api.post<UserDto>('/users', payload);
+    return data;
+  },
+
+  async updateMyLanguage(preferredLanguage: LanguageCode): Promise<UserDto> {
+    const { data } = await api.patch<UserDto>('/users/me/language', { preferredLanguage });
     return data;
   },
 };

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { extractErrorMessage } from '@/api/client';
 import { Button } from './Button';
 
@@ -14,11 +15,12 @@ export function Spinner({ className = 'h-6 w-6' }: { className?: string }) {
   );
 }
 
-export function LoadingState({ label = 'Loading…' }: { label?: string }) {
+export function LoadingState({ label }: { label?: string }) {
+  const { t } = useTranslation();
   return (
     <div className="flex animate-fade-in flex-col items-center justify-center gap-4 py-12 text-slate-500">
       <Spinner className="h-9 w-9" />
-      <p className="text-sm font-medium">{label}</p>
+      <p className="text-sm font-medium">{label ?? t('common.loading')}</p>
     </div>
   );
 }
@@ -30,6 +32,7 @@ export function ErrorState({
   error: unknown;
   onRetry?: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex animate-fade-up flex-col items-center justify-center gap-3 rounded-2xl border border-red-100 bg-gradient-to-b from-red-50/80 to-white py-10 px-6 text-center shadow-card">
       <span
@@ -41,7 +44,7 @@ export function ErrorState({
       <p className="text-sm font-semibold text-red-800">{extractErrorMessage(error)}</p>
       {onRetry && (
         <Button variant="secondary" size="sm" onClick={onRetry}>
-          Try again
+          {t('common.retry')}
         </Button>
       )}
     </div>

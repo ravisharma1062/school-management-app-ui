@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { analyticsApi } from '@/api/analytics';
 import { formatDate, formatMoney } from '@/lib/format';
 import {
@@ -24,6 +25,7 @@ import type { AttendanceTrendPointDto } from '@/types';
 const RANGE_OPTIONS = [7, 30, 90];
 
 export function AnalyticsDashboardPage() {
+  const { t } = useTranslation();
   const [studentClass, setStudentClass] = useState('');
   const [range, setRange] = useState(30);
 
@@ -42,7 +44,7 @@ export function AnalyticsDashboardPage() {
 
   return (
     <div>
-      <PageHeader title="Analytics" description="Attendance trends, fee collection, and at-risk students." />
+      <PageHeader title={t('pages.analytics.title')} description={t('pages.analytics.description')} />
 
       <div className="mb-6 flex flex-wrap items-end gap-4">
         <div className="w-48">

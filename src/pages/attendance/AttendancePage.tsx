@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { studentsApi } from '@/api/students';
 import { attendanceApi } from '@/api/attendance';
 import { extractErrorMessage } from '@/api/client';
@@ -26,6 +27,7 @@ import type { AttendanceStatus, StudentDto } from '@/types';
 const ROSTER_SIZE = 500;
 
 export function AttendancePage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [studentClass, setStudentClass] = useState('');
   const [section, setSection] = useState('');
@@ -97,7 +99,7 @@ export function AttendancePage() {
 
   return (
     <div>
-      <PageHeader title="Attendance" description="Mark daily attendance for a class." />
+      <PageHeader title={t('pages.attendance.title')} description={t('pages.attendance.description')} />
 
       <Card className="mb-6">
         <CardBody>

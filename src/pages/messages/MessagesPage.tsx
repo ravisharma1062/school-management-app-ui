@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { conversationsApi } from '@/api/conversations';
 import { extractErrorMessage } from '@/api/client';
 import { useAuth } from '@/context/AuthContext';
@@ -8,6 +9,7 @@ import { Card, EmptyState, ErrorState, LoadingState, PageHeader } from '@/compon
 import type { ConversationDto } from '@/types';
 
 export function MessagesPage() {
+  const { t } = useTranslation();
   const { user, role } = useAuth();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export function MessagesPage() {
 
   return (
     <div>
-      <PageHeader title="Messages" description="Direct messages between parents and teachers." />
+      <PageHeader title={t('pages.messages.title')} description={t('pages.messages.description')} />
 
       {error && (
         <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm font-medium text-red-700">

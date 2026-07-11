@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { eventsApi } from '@/api/events';
 import { extractErrorMessage } from '@/api/client';
 import { useAuth } from '@/context/AuthContext';
@@ -34,6 +35,7 @@ const RSVP_LABEL: Record<RsvpStatus, string> = {
 };
 
 export function EventsPage() {
+  const { t } = useTranslation();
   const { role } = useAuth();
   const isAdmin = role === 'ADMIN';
   const [view, setView] = useState<'list' | 'month'>('list');
@@ -49,8 +51,8 @@ export function EventsPage() {
   return (
     <div>
       <PageHeader
-        title="Events"
-        description="Upcoming school events."
+        title={t('pages.events.title')}
+        description={t('pages.events.description')}
         action={isAdmin ? <Button onClick={() => setCreateOpen(true)}>+ Add event</Button> : undefined}
       />
 

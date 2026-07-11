@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { extractErrorMessage } from '@/api/client';
 import { Button, Input } from '@/components/ui';
@@ -69,6 +70,7 @@ function CampusIllustration() {
 }
 
 export function LoginPage() {
+  const { t } = useTranslation();
   const { login, isAuthenticated, isBootstrapping } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -109,11 +111,10 @@ export function LoginPage() {
         <div className="relative z-10 flex max-w-lg flex-col items-center px-10 text-center">
           <CampusIllustration />
           <h2 className="mt-8 animate-fade-up text-3xl font-extrabold tracking-tight text-white">
-            Everything your school needs, in one place
+            {t('login.heroTitle')}
           </h2>
           <p className="mt-3 animate-fade-up text-brand-100" style={{ animationDelay: '0.15s' }}>
-            Students, attendance, timetables, homework, exams, fees and notices — beautifully organised
-            for admins, teachers and parents.
+            {t('login.heroSubtitle')}
           </p>
           <div className="stagger mt-8 flex flex-wrap justify-center gap-2">
             {['🎓 Students', '📋 Attendance', '🗓️ Timetable', '📚 Homework', '💰 Fees', '📢 Notices'].map(
@@ -141,8 +142,8 @@ export function LoginPage() {
             <span className="inline-flex h-16 w-16 animate-float items-center justify-center rounded-3xl bg-gradient-to-br from-brand-500 to-accent-500 text-3xl shadow-glow-lg">
               🎓
             </span>
-            <h1 className="text-gradient mt-4 text-3xl font-extrabold tracking-tight">School Management</h1>
-            <p className="mt-2 text-sm text-slate-500">Welcome back! Sign in to your account.</p>
+            <h1 className="text-gradient mt-4 text-3xl font-extrabold tracking-tight">{t('login.brand')}</h1>
+            <p className="mt-2 text-sm text-slate-500">{t('login.welcome')}</p>
           </div>
 
           <form
@@ -160,7 +161,7 @@ export function LoginPage() {
             )}
 
             <Input
-              label="Email"
+              label={t('login.email')}
               type="email"
               autoComplete="username"
               value={email}
@@ -169,7 +170,7 @@ export function LoginPage() {
               placeholder="you@school.edu"
             />
             <Input
-              label="Password"
+              label={t('login.password')}
               type="password"
               autoComplete="current-password"
               value={password}
@@ -179,12 +180,12 @@ export function LoginPage() {
             />
 
             <Button type="submit" className="w-full" loading={submitting}>
-              Sign in →
+              {t('login.signIn')}
             </Button>
           </form>
 
           <p className="mt-5 text-center text-xs text-slate-400">
-            Use the credentials provisioned by your school administrator.
+            {t('login.footer')}
           </p>
         </div>
       </div>

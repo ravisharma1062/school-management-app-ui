@@ -7,10 +7,16 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import i18n from '@/i18n';
 import { authApi } from '@/api/auth';
 import { SESSION_EXPIRED_EVENT } from '@/api/client';
 import { tokenStorage } from '@/api/tokenStorage';
 import type { Role, UserDto } from '@/types';
+
+function syncLanguage(user: UserDto) {
+  const lng = user.preferredLanguage === 'HI' ? 'hi' : 'en';
+  if (i18n.language !== lng) void i18n.changeLanguage(lng);
+}
 
 interface AuthContextValue {
   user: UserDto | null;
@@ -20,6 +26,8 @@ interface AuthContextValue {
   isBootstrapping: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  /** Updates the cached user and syncs the UI language after a language-preference change. */
+  setLanguage: (updated: UserDto) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -43,7 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       try {
         const me = await authApi.me();
-        if (!cancelled) setUser(me);
+        if (!cancelled) {
+          setUser(me);
+          syncLanguage(me);
+        }
       } catch {
         if (!cancelled) tokenStorage.clear();
       } finally {
@@ -72,6 +83,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     const me = await authApi.me();
     setUser(me);
+    syncLanguage(me);
+  }, []);
+
+  const setLanguage = useCallback((updated: UserDto) => {
+    setUser(updated);
+    syncLanguage(updated);
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -82,8 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isBootstrapping,
       login,
       logout,
+      setLanguage,
     }),
-    [user, isBootstrapping, login, logout],
+    [user, isBootstrapping, login, logout, setLanguage],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

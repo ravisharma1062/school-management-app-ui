@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { studentsApi } from '@/api/students';
 import { formatDate } from '@/lib/format';
 import { Card, CardBody, EmptyState, ErrorState, LoadingState, PageHeader } from '@/components/ui';
 
 export function MyChildrenPage() {
+  const { t } = useTranslation();
   const query = useQuery({
     queryKey: ['my-children'],
     queryFn: () => studentsApi.myChildren(),
@@ -12,7 +14,7 @@ export function MyChildrenPage() {
 
   return (
     <div>
-      <PageHeader title="My Children" description="Select a child to view their records." />
+      <PageHeader title={t('pages.children.title')} description={t('pages.children.description')} />
 
       {query.isLoading ? (
         <LoadingState />

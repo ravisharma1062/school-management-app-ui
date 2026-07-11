@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
+import { usersApi } from '@/api/users';
 import { Sidebar } from './Sidebar';
-
-const roleLabel: Record<string, string> = {
-  ADMIN: 'Administrator',
-  TEACHER: 'Teacher',
-  PARENT: 'Parent',
-};
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 export function AppShell() {
-  const { user, role, logout } = useAuth();
+  const { t } = useTranslation();
+  const { user, role, logout, setLanguage } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   if (!role) return null;
+
+  async function onLanguageChange(lang: 'EN' | 'HI') {
+    const updated = await usersApi.updateMyLanguage(lang);
+    setLanguage(updated);
+  }
 
   const initials = (user?.name ?? '?')
     .split(' ')
@@ -51,14 +54,15 @@ export function AppShell() {
           <div className="leading-tight">
             <span className="text-gradient block text-lg font-extrabold tracking-tight">School Management</span>
             <span className="hidden text-[11px] font-medium uppercase tracking-widest text-slate-400 sm:block">
-              {roleLabel[role]} Portal
+              {t(`roles.${role}`)} {t('common.portal')}
             </span>
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <LanguageSwitcher current={user?.preferredLanguage ?? 'EN'} onChange={onLanguageChange} />
           <div className="hidden text-right sm:block">
             <p className="text-sm font-semibold text-slate-800">{user?.name}</p>
-            <p className="text-xs font-medium text-brand-600">{roleLabel[role]}</p>
+            <p className="text-xs font-medium text-brand-600">{t(`roles.${role}`)}</p>
           </div>
           <div
             className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent-500 p-[2px] shadow-glow"
@@ -73,7 +77,7 @@ export function AppShell() {
             onClick={logout}
             className="rounded-xl border border-slate-200 bg-white/70 px-3 py-1.5 text-sm font-semibold text-slate-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600"
           >
-            Sign out
+            {t('common.signOut')}
           </button>
         </div>
       </header>

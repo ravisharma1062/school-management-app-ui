@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { homeworkApi } from '@/api/homework';
 import { extractErrorMessage } from '@/api/client';
 import { useAuth } from '@/context/AuthContext';
@@ -25,6 +26,7 @@ import type { HomeworkCreateRequest } from '@/types';
 const PAGE_SIZE = 10;
 
 export function HomeworkPage() {
+  const { t } = useTranslation();
   const { role } = useAuth();
   const isTeacher = role === 'TEACHER';
   const isParent = role === 'PARENT';
@@ -44,8 +46,8 @@ export function HomeworkPage() {
   return (
     <div>
       <PageHeader
-        title="Homework"
-        description="Assignments by class and section."
+        title={t('pages.homework.title')}
+        description={t('pages.homework.description')}
         action={
           isTeacher && ready ? <Button onClick={() => setModalOpen(true)}>+ Post homework</Button> : undefined
         }

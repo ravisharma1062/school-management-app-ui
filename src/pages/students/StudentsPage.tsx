@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { studentsApi } from '@/api/students';
 import { extractErrorMessage } from '@/api/client';
 import { useAuth } from '@/context/AuthContext';
@@ -29,6 +30,7 @@ import type { BulkImportResult } from '@/types';
 const PAGE_SIZE = 10;
 
 export function StudentsPage() {
+  const { t } = useTranslation();
   const { role } = useAuth();
   const isAdmin = role === 'ADMIN';
   const [page, setPage] = useState(0);
@@ -60,8 +62,8 @@ export function StudentsPage() {
   return (
     <div>
       <PageHeader
-        title="Students"
-        description="School-wide student directory."
+        title={t('pages.students.title')}
+        description={t('pages.students.description')}
         action={
           isAdmin ? (
             <div className="flex items-center gap-2">

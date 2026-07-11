@@ -3,6 +3,8 @@
 
 export type Role = 'ADMIN' | 'TEACHER' | 'PARENT';
 
+export type LanguageCode = 'EN' | 'HI';
+
 export type TargetRole = 'ADMIN' | 'TEACHER' | 'PARENT' | 'ALL';
 
 export type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED';
@@ -41,6 +43,11 @@ export interface UserDto {
   email: string;
   role: Role;
   phone?: string | null;
+  preferredLanguage: LanguageCode;
+}
+
+export interface UserLanguageUpdateRequest {
+  preferredLanguage: LanguageCode;
 }
 
 export interface UserCreateRequest {

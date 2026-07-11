@@ -1,12 +1,7 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { navFor } from '@/components/layout/nav';
-
-const greetingByRole: Record<string, string> = {
-  ADMIN: 'Manage students, staff, timetables and school-wide notices.',
-  TEACHER: 'Mark attendance, post homework, and record exam results.',
-  PARENT: "Follow your child's attendance, homework, results and fees.",
-};
 
 /** Per-route gradient so each quick-link card gets its own colour identity. */
 const cardGradients: Record<string, string> = {
@@ -45,6 +40,7 @@ function HeroIllustration() {
 }
 
 export function DashboardPage() {
+  const { t } = useTranslation();
   const { user, role } = useAuth();
   if (!role) return null;
 
@@ -61,11 +57,11 @@ export function DashboardPage() {
         </div>
         <div className="relative z-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-brand-200">Dashboard</p>
+            <p className="text-sm font-semibold uppercase tracking-widest text-brand-200">{t('dashboard.label')}</p>
             <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-white">
-              Welcome back, {firstName}! 👋
+              {t('dashboard.welcome', { name: firstName })}
             </h1>
-            <p className="mt-2 max-w-xl text-brand-100">{greetingByRole[role]}</p>
+            <p className="mt-2 max-w-xl text-brand-100">{t(`dashboard.greeting.${role}`)}</p>
           </div>
           <HeroIllustration />
         </div>
@@ -92,8 +88,8 @@ export function DashboardPage() {
                   {item.icon}
                 </span>
                 <div>
-                  <p className="font-bold text-slate-900">{item.label}</p>
-                  <p className="text-sm text-slate-500">Go to {item.label.toLowerCase()}</p>
+                  <p className="font-bold text-slate-900">{t(`nav.${item.labelKey}`)}</p>
+                  <p className="text-sm text-slate-500">{t('dashboard.goTo', { label: t(`nav.${item.labelKey}`) })}</p>
                 </div>
                 <span
                   aria-hidden="true"

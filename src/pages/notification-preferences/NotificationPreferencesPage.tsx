@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { notificationPreferencesApi } from '@/api/notificationPreferences';
 import { extractErrorMessage } from '@/api/client';
 import {
@@ -26,6 +27,7 @@ const EVENT_LABEL: Record<NotificationEventType, string> = {
 };
 
 export function NotificationPreferencesPage() {
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
@@ -54,8 +56,8 @@ export function NotificationPreferencesPage() {
   return (
     <div>
       <PageHeader
-        title="Notification Preferences"
-        description="Choose which events send SMS or email. Push notifications for notices are always on."
+        title={t('pages.notificationPreferences.title')}
+        description={t('pages.notificationPreferences.description')}
       />
 
       {error && (

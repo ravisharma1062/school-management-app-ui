@@ -1,0 +1,76 @@
+{
+  "common": {
+    "signOut": "Sign out",
+    "portal": "Portal",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "results": "results",
+    "result": "result",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{totalPages}} · {{count}} results"
+  },
+  "roles": {
+    "ADMIN": "Administrator",
+    "TEACHER": "Teacher",
+    "PARENT": "Parent"
+  },
+  "language": {
+    "en": "English",
+    "hi": "हिंदी"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "students": "Students",
+    "children": "My Children",
+    "attendance": "Attendance",
+    "timetable": "Timetable",
+    "homework": "Homework",
+    "notices": "Notices",
+    "leaveRequests": "Leave Requests",
+    "events": "Events",
+    "library": "Library",
+    "messages": "Messages",
+    "users": "Users",
+    "notificationPreferences": "Notifications",
+    "analytics": "Analytics",
+    "busRoutes": "Bus Routes"
+  },
+  "login": {
+    "brand": "School Management",
+    "welcome": "Welcome back! Sign in to your account.",
+    "heroTitle": "Everything your school needs, in one place",
+    "heroSubtitle": "Students, attendance, timetables, homework, exams, fees and notices — beautifully organised for admins, teachers and parents.",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in →",
+    "footer": "Use the credentials provisioned by your school administrator."
+  },
+  "dashboard": {
+    "label": "Dashboard",
+    "welcome": "Welcome back, {{name}}! 👋",
+    "goTo": "Go to {{label}}",
+    "greeting": {
+      "ADMIN": "Manage students, staff, timetables and school-wide notices.",
+      "TEACHER": "Mark attendance, post homework, and record exam results.",
+      "PARENT": "Follow your child's attendance, homework, results and fees."
+    }
+  },
+  "pages": {
+    "students": { "title": "Students", "description": "School-wide student directory." },
+    "children": { "title": "My Children", "description": "Select a child to view their records." },
+    "attendance": { "title": "Attendance", "description": "Mark daily attendance for a class." },
+    "timetable": { "title": "Timetable", "description": "Weekly class timetable." },
+    "homework": { "title": "Homework", "description": "Assignments by class and section." },
+    "notices": { "title": "Notices", "description": "School announcements." },
+    "leaveRequestsAdmin": { "title": "Leave Requests", "description": "Review and approve leave requests." },
+    "leaveRequests": { "title": "Leave Requests", "description": "Submit and track your leave requests." },
+    "events": { "title": "Events", "description": "Upcoming school events." },
+    "library": { "title": "Library", "description": "Manage the book catalog and issue books to students." },
+    "messages": { "title": "Messages", "description": "Direct messages between parents and teachers." },
+    "users": { "title": "Users", "description": "Manage teacher, parent and administrator accounts." },
+    "notificationPreferences": { "title": "Notification Preferences", "description": "Choose which events send SMS or email. Push notifications for notices are always on." },
+    "analytics": { "title": "Analytics", "description": "Attendance trends, fee collection, and at-risk students." },
+    "busRoutes": { "title": "Bus Routes", "description": "Manage routes, stops, and device location tokens." }
+  }
+}

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { usersApi } from '@/api/users';
 import { extractErrorMessage } from '@/api/client';
 import { ROLES } from '@/lib/format';
@@ -33,6 +34,7 @@ const roleTone: Record<Role, 'purple' | 'blue' | 'green'> = {
 };
 
 export function UsersPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [roleFilter, setRoleFilter] = useState<Role | ''>('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -47,8 +49,8 @@ export function UsersPage() {
   return (
     <div>
       <PageHeader
-        title="Users"
-        description="Manage teacher, parent and administrator accounts."
+        title={t('pages.users.title')}
+        description={t('pages.users.description')}
         action={<Button onClick={() => setModalOpen(true)}>+ Add user</Button>}
       />
 

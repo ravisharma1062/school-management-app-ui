@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { noticesApi } from '@/api/notices';
 import { extractErrorMessage } from '@/api/client';
 import { useAuth } from '@/context/AuthContext';
@@ -24,6 +25,7 @@ import type { NoticeCreateRequest, TargetRole } from '@/types';
 const PAGE_SIZE = 10;
 
 export function NoticesPage() {
+  const { t } = useTranslation();
   const { role } = useAuth();
   const isAdmin = role === 'ADMIN';
   const [page, setPage] = useState(0);
@@ -59,8 +61,8 @@ export function NoticesPage() {
   return (
     <div>
       <PageHeader
-        title="Notices"
-        description="School announcements."
+        title={t('pages.notices.title')}
+        description={t('pages.notices.description')}
         action={isAdmin ? <Button onClick={() => setModalOpen(true)}>+ Post notice</Button> : undefined}
       />
 

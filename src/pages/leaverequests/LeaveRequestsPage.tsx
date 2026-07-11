@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { leaveRequestsApi } from '@/api/leaveRequests';
 import { extractErrorMessage } from '@/api/client';
 import { useAuth } from '@/context/AuthContext';
@@ -28,6 +29,7 @@ import type { LeaveRequestCreateRequest, LeaveStatus, LeaveType } from '@/types'
 const PAGE_SIZE = 10;
 
 export function LeaveRequestsPage() {
+  const { t } = useTranslation();
   const { role } = useAuth();
   const isAdmin = role === 'ADMIN';
   const [page, setPage] = useState(0);
@@ -55,8 +57,8 @@ export function LeaveRequestsPage() {
   return (
     <div>
       <PageHeader
-        title="Leave Requests"
-        description={isAdmin ? 'Review and approve leave requests.' : 'Submit and track your leave requests.'}
+        title={t(isAdmin ? 'pages.leaveRequestsAdmin.title' : 'pages.leaveRequests.title')}
+        description={t(isAdmin ? 'pages.leaveRequestsAdmin.description' : 'pages.leaveRequests.description')}
       />
 
       {!isAdmin && <RequestLeaveForm />}

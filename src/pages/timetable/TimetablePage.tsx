@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { timetableApi } from '@/api/timetable';
 import { usersApi } from '@/api/users';
 import { extractErrorMessage } from '@/api/client';
@@ -32,6 +33,7 @@ const DAY_LABEL: Record<DayOfWeek, string> = {
 const WEEK: DayOfWeek[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 
 export function TimetablePage() {
+  const { t } = useTranslation();
   const { role } = useAuth();
   const isAdmin = role === 'ADMIN';
   const [cs, setCs] = useState<ClassSection>({ studentClass: '', section: '' });
@@ -63,8 +65,8 @@ export function TimetablePage() {
   return (
     <div>
       <PageHeader
-        title="Timetable"
-        description="Weekly class timetable."
+        title={t('pages.timetable.title')}
+        description={t('pages.timetable.description')}
         action={
           isAdmin && ready ? <Button onClick={() => setModalOpen(true)}>+ Add entry</Button> : undefined
         }
