@@ -21,6 +21,7 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/users', label: 'Users', roles: ['ADMIN'], icon: '👥' },
   { to: '/notification-preferences', label: 'Notifications', roles: ['ADMIN'], icon: '🔔' },
   { to: '/analytics', label: 'Analytics', roles: ['ADMIN'], icon: '📊' },
+  { to: '/bus-routes', label: 'Bus Routes', roles: ['ADMIN'], icon: '🚌' },
 ];
 
 export function navFor(role: Role): NavItem[] {

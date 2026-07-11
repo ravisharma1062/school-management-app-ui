@@ -404,6 +404,65 @@ export interface EventRsvpRequest {
   status: RsvpStatus;
 }
 
+// --- Transport ---
+export interface BusStopDto {
+  id: string;
+  name: string;
+  stopOrder: number;
+  latitude: number;
+  longitude: number;
+}
+
+export interface BusStopCreateRequest {
+  name: string;
+  stopOrder: number;
+  latitude: number;
+  longitude: number;
+}
+
+export interface BusRouteAdminDto {
+  id: string;
+  name: string;
+  description?: string | null;
+  locationToken: string;
+  stops: BusStopDto[];
+  createdAt: string;
+}
+
+export interface BusRouteSummaryDto {
+  id: string;
+  name: string;
+  description?: string | null;
+  stopCount: number;
+}
+
+export interface BusRouteCreateRequest {
+  name: string;
+  description?: string;
+  stops: BusStopCreateRequest[];
+}
+
+export interface BusLocationDto {
+  latitude?: number | null;
+  longitude?: number | null;
+  updatedAt?: string | null;
+}
+
+export interface StudentTransportDto {
+  studentId: string;
+  routeId: string;
+  routeName: string;
+  stopId: string;
+  stopName: string;
+  stopLatitude: number;
+  stopLongitude: number;
+}
+
+export interface StudentTransportAssignRequest {
+  routeId: string;
+  stopId: string;
+}
+
 // --- Spring Data Page<T> (subset we actually use) ---
 export interface Page<T> {
   content: T[];

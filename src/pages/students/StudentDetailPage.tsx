@@ -18,16 +18,18 @@ import {
 import { AttendancePanel } from '@/components/features/AttendancePanel';
 import { ExamResultsPanel } from '@/components/features/ExamResultsPanel';
 import { FeesPanel } from '@/components/features/FeesPanel';
+import { TransportPanel } from '@/components/features/TransportPanel';
 import { StudentFormModal } from './StudentFormModal';
 import type { Role } from '@/types';
 
-type TabKey = 'profile' | 'attendance' | 'results' | 'fees';
+type TabKey = 'profile' | 'attendance' | 'results' | 'fees' | 'transport';
 
 const TAB_ROLES: Record<TabKey, Role[]> = {
   profile: ['ADMIN', 'TEACHER', 'PARENT'],
   attendance: ['TEACHER', 'PARENT'],
   results: ['TEACHER', 'PARENT'],
   fees: ['ADMIN', 'PARENT'],
+  transport: ['ADMIN', 'PARENT'],
 };
 
 const TAB_LABEL: Record<TabKey, string> = {
@@ -35,6 +37,7 @@ const TAB_LABEL: Record<TabKey, string> = {
   attendance: 'Attendance',
   results: 'Exam Results',
   fees: 'Fees',
+  transport: 'Transport',
 };
 
 export function StudentDetailPage() {
@@ -168,6 +171,14 @@ export function StudentDetailPage() {
             <Card>
               <CardBody>
                 <FeesPanel studentId={id} canEdit={role === 'ADMIN'} />
+              </CardBody>
+            </Card>
+          )}
+
+          {activeTab === 'transport' && (
+            <Card>
+              <CardBody>
+                <TransportPanel studentId={id} canAssign={role === 'ADMIN'} />
               </CardBody>
             </Card>
           )}

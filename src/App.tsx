@@ -16,6 +16,7 @@ import { LeaveRequestsPage } from '@/pages/leaverequests/LeaveRequestsPage';
 import { MessagesPage } from '@/pages/messages/MessagesPage';
 import { EventsPage } from '@/pages/events/EventsPage';
 import { AnalyticsDashboardPage } from '@/pages/analytics/AnalyticsDashboardPage';
+import { TransportRoutesPage } from '@/pages/transport/TransportRoutesPage';
 import { NotificationPreferencesPage } from '@/pages/notification-preferences/NotificationPreferencesPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -63,6 +64,7 @@ export function App() {
             <Route path="/users" element={<UsersPage />} />
             <Route path="/notification-preferences" element={<NotificationPreferencesPage />} />
             <Route path="/analytics" element={<AnalyticsDashboardPage />} />
+            <Route path="/bus-routes" element={<TransportRoutesPage />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />
