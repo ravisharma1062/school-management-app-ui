@@ -1,4 +1,4 @@
-import type { AttendanceStatus, DayOfWeek, FeeStatus, Role, TargetRole } from '@/types';
+import type { AttendanceStatus, DayOfWeek, FeeStatus, LeaveType, Role, TargetRole } from '@/types';
 
 export function formatDate(iso: string | null | undefined): string {
   if (!iso) return '—';
@@ -33,6 +33,7 @@ export const ROLES: Role[] = ['ADMIN', 'TEACHER', 'PARENT'];
 export const TARGET_ROLES: TargetRole[] = ['ALL', 'ADMIN', 'TEACHER', 'PARENT'];
 export const ATTENDANCE_STATUSES: AttendanceStatus[] = ['PRESENT', 'ABSENT', 'LATE', 'EXCUSED'];
 export const FEE_STATUSES: FeeStatus[] = ['PENDING', 'PARTIAL', 'PAID', 'OVERDUE'];
+export const LEAVE_TYPES: LeaveType[] = ['SICK', 'CASUAL', 'OTHER'];
 export const DAYS_OF_WEEK: DayOfWeek[] = [
   'MONDAY',
   'TUESDAY',

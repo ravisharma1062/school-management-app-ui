@@ -1,14 +1,15 @@
 import { api } from './client';
 import type {
+  BulkImportResult,
   Page,
-  PageParams,
   StudentCreateRequest,
   StudentDto,
+  StudentSearchParams,
   StudentUpdateRequest,
 } from '@/types';
 
 export const studentsApi = {
-  async list(params: PageParams = {}): Promise<Page<StudentDto>> {
+  async list(params: StudentSearchParams = {}): Promise<Page<StudentDto>> {
     const { data } = await api.get<Page<StudentDto>>('/students', { params });
     return data;
   },
@@ -30,6 +31,25 @@ export const studentsApi = {
 
   async update(id: string, payload: StudentUpdateRequest): Promise<StudentDto> {
     const { data } = await api.patch<StudentDto>(`/students/${id}`, payload);
+    return data;
+  },
+
+  async archive(id: string): Promise<StudentDto> {
+    const { data } = await api.patch<StudentDto>(`/students/${id}/archive`);
+    return data;
+  },
+
+  async restore(id: string): Promise<StudentDto> {
+    const { data } = await api.patch<StudentDto>(`/students/${id}/restore`);
+    return data;
+  },
+
+  async bulkImport(file: File): Promise<BulkImportResult> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const { data } = await api.post<BulkImportResult>('/students/bulk-import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return data;
   },
 };

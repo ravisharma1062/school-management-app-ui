@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { AttendanceStatus, FeeStatus } from '@/types';
+import type { AttendanceStatus, FeeStatus, HomeworkSubmissionStatus, LeaveStatus } from '@/types';
 
 type Tone = 'gray' | 'green' | 'red' | 'yellow' | 'blue' | 'purple';
 
@@ -52,4 +52,23 @@ const feeTone: Record<FeeStatus, Tone> = {
 
 export function FeeBadge({ status }: { status: FeeStatus }) {
   return <Badge tone={feeTone[status]}>{status}</Badge>;
+}
+
+const leaveTone: Record<LeaveStatus, Tone> = {
+  PENDING: 'yellow',
+  APPROVED: 'green',
+  REJECTED: 'red',
+};
+
+export function LeaveStatusBadge({ status }: { status: LeaveStatus }) {
+  return <Badge tone={leaveTone[status]}>{status}</Badge>;
+}
+
+const homeworkSubmissionTone: Record<HomeworkSubmissionStatus, Tone> = {
+  SUBMITTED: 'blue',
+  GRADED: 'green',
+};
+
+export function HomeworkSubmissionBadge({ status }: { status: HomeworkSubmissionStatus }) {
+  return <Badge tone={homeworkSubmissionTone[status]}>{status}</Badge>;
 }

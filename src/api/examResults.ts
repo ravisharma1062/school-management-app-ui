@@ -11,4 +11,12 @@ export const examResultsApi = {
     const { data } = await api.post<ExamResultDto>('/exam-results', payload);
     return data;
   },
+
+  async downloadReportCard(studentId: string, term?: string): Promise<Blob> {
+    const { data } = await api.get(`/exam-results/student/${studentId}/report-card`, {
+      params: term ? { term } : undefined,
+      responseType: 'blob',
+    });
+    return data;
+  },
 };

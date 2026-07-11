@@ -36,13 +36,26 @@ export function TimetablePage() {
   const isAdmin = role === 'ADMIN';
   const [cs, setCs] = useState<ClassSection>({ studentClass: '', section: '' });
   const [modalOpen, setModalOpen] = useState(false);
+  const [includeArchived, setIncludeArchived] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const ready = !!cs.studentClass && !!cs.section;
 
   const query = useQuery({
-    queryKey: ['timetable', cs.studentClass, cs.section],
-    queryFn: () => timetableApi.byClass(cs.studentClass, cs.section),
+    queryKey: ['timetable', cs.studentClass, cs.section, includeArchived],
+    queryFn: () => timetableApi.byClass(cs.studentClass, cs.section, includeArchived),
     enabled: ready,
+  });
+
+  const archiveMutation = useMutation({
+    mutationFn: ({ id, active }: { id: string; active: boolean }) =>
+      active ? timetableApi.archive(id) : timetableApi.restore(id),
+    onSuccess: () => {
+      setActionError(null);
+      queryClient.invalidateQueries({ queryKey: ['timetable', cs.studentClass, cs.section] });
+    },
+    onError: (err) => setActionError(extractErrorMessage(err)),
   });
 
   const { periods, grid } = useMemo(() => buildGrid(query.data ?? []), [query.data]);
@@ -58,10 +71,27 @@ export function TimetablePage() {
       />
 
       <Card className="mb-6">
-        <div className="p-4 sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-4 p-4 sm:p-6">
           <ClassSectionPicker value={cs} onChange={setCs} />
+          {isAdmin && (
+            <label className="flex items-center gap-2 pb-1 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={includeArchived}
+                onChange={(e) => setIncludeArchived(e.target.checked)}
+                className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+              />
+              Show archived
+            </label>
+          )}
         </div>
       </Card>
+
+      {actionError && (
+        <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm font-medium text-red-700">
+          {actionError}
+        </div>
+      )}
 
       {!ready ? (
         <EmptyState title="Select a class and section" message="Choose above to view the timetable." />
@@ -102,8 +132,26 @@ export function TimetablePage() {
                       return (
                         <td key={d} className="border border-slate-100 px-3 py-2">
                           {entry ? (
-                            <span className="inline-flex rounded-lg bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 ring-1 ring-inset ring-brand-100">
+                            <span
+                              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${
+                                entry.active
+                                  ? 'bg-brand-50 text-brand-700 ring-brand-100'
+                                  : 'bg-slate-100 text-slate-500 ring-slate-200'
+                              }`}
+                            >
                               {entry.subject}
+                              {!entry.active && <span className="text-[10px] uppercase">Archived</span>}
+                              {isAdmin && (
+                                <button
+                                  type="button"
+                                  title={entry.active ? 'Archive' : 'Restore'}
+                                  disabled={archiveMutation.isPending && archiveMutation.variables?.id === entry.id}
+                                  onClick={() => archiveMutation.mutate({ id: entry.id, active: entry.active })}
+                                  className="ml-0.5 rounded-full px-1 text-current hover:bg-black/10 disabled:opacity-50"
+                                >
+                                  {entry.active ? '×' : '↺'}
+                                </button>
+                              )}
                             </span>
                           ) : (
                             <span className="text-slate-300">—</span>

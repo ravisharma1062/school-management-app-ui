@@ -60,6 +60,7 @@ export interface StudentDto {
   section: string;
   dob: string; // ISO date (yyyy-MM-dd)
   parentId?: string | null;
+  active: boolean;
 }
 
 export interface StudentCreateRequest {
@@ -78,6 +79,25 @@ export interface StudentUpdateRequest {
   section?: string;
   dob?: string;
   parentId?: string;
+}
+
+export interface StudentSearchParams extends PageParams {
+  name?: string;
+  rollNo?: string;
+  studentClass?: string;
+  includeArchived?: boolean;
+}
+
+export interface BulkImportRowError {
+  row: number;
+  message: string;
+}
+
+export interface BulkImportResult {
+  totalRows: number;
+  successCount: number;
+  failureCount: number;
+  errors: BulkImportRowError[];
 }
 
 // --- Attendance ---
@@ -104,6 +124,7 @@ export interface TimetableDto {
   period: number;
   subject: string;
   teacherId: string;
+  active: boolean;
 }
 
 export interface TimetableCreateRequest {
@@ -137,6 +158,74 @@ export interface HomeworkCreateRequest {
   dueDate: string;
 }
 
+// --- Homework Submissions ---
+export type HomeworkSubmissionStatus = 'SUBMITTED' | 'GRADED';
+
+export interface HomeworkSubmissionDto {
+  id: string;
+  homeworkId: string;
+  studentId: string;
+  fileName: string;
+  contentType: string;
+  status: HomeworkSubmissionStatus;
+  teacherFeedback?: string | null;
+  grade?: string | null;
+  submittedAt: string;
+}
+
+export interface HomeworkSubmissionGradeRequest {
+  teacherFeedback?: string;
+  grade: string;
+}
+
+// --- Notification Preferences ---
+export type NotificationEventType =
+  | 'ATTENDANCE_ABSENT'
+  | 'FEE_OVERDUE'
+  | 'NOTICE_CREATED'
+  | 'EXAM_RESULT_PUBLISHED'
+  | 'USER_WELCOME'
+  | 'MESSAGE_RECEIVED';
+
+export interface NotificationPreferenceDto {
+  eventType: NotificationEventType;
+  smsEnabled: boolean;
+  emailEnabled: boolean;
+}
+
+export interface NotificationPreferenceUpdateRequest {
+  smsEnabled: boolean;
+  emailEnabled: boolean;
+}
+
+// --- Leave Requests ---
+export type LeaveType = 'SICK' | 'CASUAL' | 'OTHER';
+
+export type LeaveStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface LeaveRequestDto {
+  id: string;
+  requesterId: string;
+  type: LeaveType;
+  fromDate: string;
+  toDate: string;
+  reason?: string | null;
+  status: LeaveStatus;
+  reviewedBy?: string | null;
+  createdAt: string;
+}
+
+export interface LeaveRequestCreateRequest {
+  type: LeaveType;
+  fromDate: string;
+  toDate: string;
+  reason?: string;
+}
+
+export interface LeaveRequestReviewRequest {
+  status: Exclude<LeaveStatus, 'PENDING'>;
+}
+
 // --- Exam Results ---
 export interface ExamResultDto {
   id: string;
@@ -166,6 +255,7 @@ export interface NoticeDto {
   targetRole: TargetRole;
   createdBy: string;
   createdAt: string;
+  active: boolean;
 }
 
 export interface NoticeCreateRequest {
@@ -188,6 +278,130 @@ export interface FeeDto {
 export interface FeeUpdateRequest {
   amountPaid?: number;
   status?: FeeStatus;
+}
+
+// --- Payments ---
+export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED';
+
+export interface PaymentDto {
+  id: string;
+  feeId: string;
+  amount: number;
+  gatewayOrderId?: string | null;
+  gatewayPaymentId?: string | null;
+  status: PaymentStatus;
+  initiatedBy: string;
+  paidAt?: string | null;
+  createdAt: string;
+}
+
+export interface PaymentInitiateRequest {
+  feeId: string;
+}
+
+export interface PaymentInitiateResponse {
+  gatewayOrderId: string;
+  amountInSmallestUnit: number;
+  currency: string;
+  gatewayKeyId: string;
+}
+
+// --- Messaging ---
+export interface ConversationDto {
+  id: string;
+  parentId: string;
+  parentName: string;
+  teacherId: string;
+  teacherName: string;
+  createdAt: string;
+}
+
+export interface ConversationCreateRequest {
+  otherUserId: string;
+}
+
+export interface ConversationContactDto {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface MessageDto {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  body: string;
+  sentAt: string;
+}
+
+export interface MessageCreateRequest {
+  body: string;
+}
+
+// --- Analytics ---
+export interface AttendanceTrendPointDto {
+  date: string;
+  presentCount: number;
+  absentCount: number;
+  lateCount: number;
+  excusedCount: number;
+  attendancePercentage: number;
+}
+
+export interface FeeSummaryDto {
+  totalDue: number;
+  totalPaid: number;
+  totalOutstanding: number;
+  collectionPercentage: number;
+  pendingCount: number;
+  partialCount: number;
+  paidCount: number;
+  overdueCount: number;
+}
+
+export interface AtRiskStudentDto {
+  studentId: string;
+  studentName: string;
+  studentClass: string;
+  section: string;
+  attendancePercentage?: number | null;
+  attendanceAtRisk: boolean;
+  feeAtRisk: boolean;
+  maxDaysOverdue?: number | null;
+}
+
+// --- Events ---
+export type RsvpStatus = 'GOING' | 'MAYBE' | 'NOT_GOING';
+
+export interface EventDto {
+  id: string;
+  title: string;
+  description?: string | null;
+  eventDate: string;
+  location?: string | null;
+  createdBy: string;
+  createdAt: string;
+  myRsvpStatus?: RsvpStatus | null;
+}
+
+export interface EventCreateRequest {
+  title: string;
+  description?: string;
+  eventDate: string;
+  location?: string;
+}
+
+export interface EventRsvpDto {
+  id: string;
+  eventId: string;
+  userId: string;
+  userName: string;
+  status: RsvpStatus;
+  respondedAt: string;
+}
+
+export interface EventRsvpRequest {
+  status: RsvpStatus;
 }
 
 // --- Spring Data Page<T> (subset we actually use) ---

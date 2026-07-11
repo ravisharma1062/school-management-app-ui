@@ -27,20 +27,48 @@ export function ExamResultsPanel({
   canRecord: boolean;
 }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const query = useQuery({
     queryKey: ['exam-results', studentId],
     queryFn: () => examResultsApi.byStudent(studentId),
   });
 
+  const downloadMutation = useMutation({
+    mutationFn: () => examResultsApi.downloadReportCard(studentId),
+    onSuccess: (blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'report-card.pdf';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    },
+    onError: (err) => setDownloadError(extractErrorMessage(err)),
+  });
+
   return (
     <div className="space-y-4">
-      {canRecord && (
-        <div className="flex justify-end">
+      <div className="flex items-center justify-end gap-2">
+        {downloadError && <p className="text-sm text-red-600">{downloadError}</p>}
+        <Button
+          size="sm"
+          variant="secondary"
+          loading={downloadMutation.isPending}
+          onClick={() => {
+            setDownloadError(null);
+            downloadMutation.mutate();
+          }}
+        >
+          Download report card
+        </Button>
+        {canRecord && (
           <Button size="sm" onClick={() => setModalOpen(true)}>
             + Record result
           </Button>
-        </div>
-      )}
+        )}
+      </div>
 
       {query.isLoading ? (
         <LoadingState />

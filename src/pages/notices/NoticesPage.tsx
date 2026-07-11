@@ -28,13 +28,32 @@ export function NoticesPage() {
   const isAdmin = role === 'ADMIN';
   const [page, setPage] = useState(0);
   const [filter, setFilter] = useState<TargetRole | ''>('');
+  const [includeArchived, setIncludeArchived] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['notices', filter, page],
+    queryKey: ['notices', filter, page, includeArchived],
     queryFn: () =>
-      noticesApi.list({ page, size: PAGE_SIZE, sort: 'createdAt,desc', role: filter || undefined }),
+      noticesApi.list({
+        page,
+        size: PAGE_SIZE,
+        sort: 'createdAt,desc',
+        role: filter || undefined,
+        includeArchived,
+      }),
     placeholderData: keepPreviousData,
+  });
+
+  const archiveMutation = useMutation({
+    mutationFn: ({ id, active }: { id: string; active: boolean }) =>
+      active ? noticesApi.archive(id) : noticesApi.restore(id),
+    onSuccess: () => {
+      setActionError(null);
+      queryClient.invalidateQueries({ queryKey: ['notices'] });
+    },
+    onError: (err) => setActionError(extractErrorMessage(err)),
   });
 
   return (
@@ -45,7 +64,7 @@ export function NoticesPage() {
         action={isAdmin ? <Button onClick={() => setModalOpen(true)}>+ Post notice</Button> : undefined}
       />
 
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-4 flex flex-wrap items-center gap-3">
         <label htmlFor="notice-filter" className="text-sm text-slate-600">
           Audience
         </label>
@@ -66,7 +85,27 @@ export function NoticesPage() {
             ))}
           </Select>
         </div>
+        {isAdmin && (
+          <label className="flex items-center gap-2 text-sm text-slate-600">
+            <input
+              type="checkbox"
+              checked={includeArchived}
+              onChange={(e) => {
+                setIncludeArchived(e.target.checked);
+                setPage(0);
+              }}
+              className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+            />
+            Show archived
+          </label>
+        )}
       </div>
+
+      {actionError && (
+        <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm font-medium text-red-700">
+          {actionError}
+        </div>
+      )}
 
       {query.isLoading ? (
         <LoadingState />
@@ -85,10 +124,23 @@ export function NoticesPage() {
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold text-slate-900">{n.title}</h3>
                         <Badge tone="purple">{n.targetRole}</Badge>
+                        {!n.active && <Badge tone="gray">Archived</Badge>}
                       </div>
                       {n.description && <p className="mt-1 text-sm text-slate-600">{n.description}</p>}
                     </div>
-                    <p className="shrink-0 text-xs text-slate-400">{formatDateTime(n.createdAt)}</p>
+                    <div className="flex shrink-0 items-center gap-3">
+                      <p className="text-xs text-slate-400">{formatDateTime(n.createdAt)}</p>
+                      {isAdmin && (
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          loading={archiveMutation.isPending && archiveMutation.variables?.id === n.id}
+                          onClick={() => archiveMutation.mutate({ id: n.id, active: n.active })}
+                        >
+                          {n.active ? 'Archive' : 'Restore'}
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </CardBody>
               </Card>

@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { studentsApi } from '@/api/students';
+import { extractErrorMessage } from '@/api/client';
 import { useAuth } from '@/context/AuthContext';
 import { formatDate } from '@/lib/format';
 import {
+  Badge,
   Button,
   Card,
   CardBody,
@@ -39,6 +41,8 @@ export function StudentDetailPage() {
   const { id = '' } = useParams();
   const { role } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
+  const [archiveError, setArchiveError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const tabs = (Object.keys(TAB_ROLES) as TabKey[]).filter((t) => role && TAB_ROLES[t].includes(role));
   const [tab, setTab] = useState<TabKey>('profile');
@@ -48,6 +52,16 @@ export function StudentDetailPage() {
     queryKey: ['student', id],
     queryFn: () => studentsApi.getById(id),
     enabled: !!id,
+  });
+
+  const archiveMutation = useMutation({
+    mutationFn: () => (query.data?.active ? studentsApi.archive(id) : studentsApi.restore(id)),
+    onSuccess: () => {
+      setArchiveError(null);
+      queryClient.invalidateQueries({ queryKey: ['student', id] });
+      queryClient.invalidateQueries({ queryKey: ['students'] });
+    },
+    onError: (err) => setArchiveError(extractErrorMessage(err)),
   });
 
   const backLink = role === 'PARENT' ? '/children' : '/students';
@@ -67,12 +81,34 @@ export function StudentDetailPage() {
       ) : query.data ? (
         <div>
           <PageHeader
-            title={query.data.name}
+            title={
+              <span className="inline-flex items-center gap-2">
+                {query.data.name}
+                {!query.data.active && <Badge tone="gray">Archived</Badge>}
+              </span>
+            }
             description={`Class ${query.data.studentClass}-${query.data.section} · Roll ${query.data.rollNo}`}
             action={
-              role === 'ADMIN' ? <Button onClick={() => setEditOpen(true)}>Edit</Button> : undefined
+              role === 'ADMIN' ? (
+                <div className="flex items-center gap-2">
+                  <Button onClick={() => setEditOpen(true)}>Edit</Button>
+                  <Button
+                    variant="danger"
+                    loading={archiveMutation.isPending}
+                    onClick={() => archiveMutation.mutate()}
+                  >
+                    {query.data.active ? 'Archive' : 'Restore'}
+                  </Button>
+                </div>
+              ) : undefined
             }
           />
+
+          {archiveError && (
+            <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm font-medium text-red-700">
+              {archiveError}
+            </div>
+          )}
 
           {/* Tabs */}
           <div
