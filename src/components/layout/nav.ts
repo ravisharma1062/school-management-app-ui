@@ -1,4 +1,4 @@
-import type { Role } from '@/types';
+import type { FeatureKey, Role } from '@/types';
 
 export interface NavItem {
   to: string;
@@ -6,6 +6,8 @@ export interface NavItem {
   labelKey: string; // i18next key under "nav"
   roles: Role[];
   icon: string; // simple emoji glyph to avoid an icon dependency
+  /** Hidden when the tenant's plan doesn't include this feature (checked via useSubscription().isEntitled). */
+  featureKey?: FeatureKey;
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -18,14 +20,15 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/notices', label: 'Notices', labelKey: 'notices', roles: ['ADMIN', 'TEACHER', 'PARENT'], icon: '📢' },
   { to: '/leave-requests', label: 'Leave Requests', labelKey: 'leaveRequests', roles: ['ADMIN', 'TEACHER', 'PARENT'], icon: '🏖️' },
   { to: '/events', label: 'Events', labelKey: 'events', roles: ['ADMIN', 'TEACHER', 'PARENT'], icon: '🎉' },
-  { to: '/library', label: 'Library', labelKey: 'library', roles: ['ADMIN', 'TEACHER', 'PARENT'], icon: '📖' },
-  { to: '/messages', label: 'Messages', labelKey: 'messages', roles: ['TEACHER', 'PARENT'], icon: '💬' },
+  { to: '/library', label: 'Library', labelKey: 'library', roles: ['ADMIN', 'TEACHER', 'PARENT'], icon: '📖', featureKey: 'LIBRARY' },
+  { to: '/messages', label: 'Messages', labelKey: 'messages', roles: ['TEACHER', 'PARENT'], icon: '💬', featureKey: 'MESSAGING' },
   { to: '/users', label: 'Users', labelKey: 'users', roles: ['ADMIN'], icon: '👥' },
   { to: '/notification-preferences', label: 'Notifications', labelKey: 'notificationPreferences', roles: ['ADMIN'], icon: '🔔' },
-  { to: '/analytics', label: 'Analytics', labelKey: 'analytics', roles: ['ADMIN'], icon: '📊' },
-  { to: '/bus-routes', label: 'Bus Routes', labelKey: 'busRoutes', roles: ['ADMIN'], icon: '🚌' },
+  { to: '/analytics', label: 'Analytics', labelKey: 'analytics', roles: ['ADMIN'], icon: '📊', featureKey: 'ANALYTICS' },
+  { to: '/bus-routes', label: 'Bus Routes', labelKey: 'busRoutes', roles: ['ADMIN'], icon: '🚌', featureKey: 'TRANSPORT_TRACKING' },
+  { to: '/account', label: 'Account', labelKey: 'account', roles: ['ADMIN'], icon: '⚙️' },
 ];
 
-export function navFor(role: Role): NavItem[] {
-  return NAV_ITEMS.filter((item) => item.roles.includes(role));
+export function navFor(role: Role, isEntitled: (key: FeatureKey) => boolean = () => true): NavItem[] {
+  return NAV_ITEMS.filter((item) => item.roles.includes(role) && (!item.featureKey || isEntitled(item.featureKey)));
 }

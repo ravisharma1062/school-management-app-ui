@@ -526,3 +526,36 @@ export interface PageParams {
   size?: number;
   sort?: string;
 }
+
+// --- Subscription / Entitlements (Phase MT-2) ---
+export type PlanCode = 'BASIC' | 'STANDARD' | 'PREMIUM';
+
+export type SchoolStatus = 'TRIAL' | 'ACTIVE' | 'PAST_DUE' | 'SUSPENDED' | 'CANCELLED';
+
+export type FeatureKey =
+  | 'EMAIL_NOTIFICATIONS'
+  | 'SMS_NOTIFICATIONS'
+  | 'ONLINE_PAYMENTS'
+  | 'MESSAGING'
+  | 'TRANSPORT_TRACKING'
+  | 'LIBRARY'
+  | 'ANALYTICS'
+  | 'MAX_STUDENTS';
+
+export interface EntitlementDto {
+  featureKey: FeatureKey;
+  enabled: boolean;
+  limitValue: number | null;
+}
+
+export interface SubscriptionDto {
+  planCode: PlanCode;
+  planName: string;
+  status: SchoolStatus;
+  trialEndsAt: string | null;
+  currentPeriodEnd: string | null;
+  entitlements: EntitlementDto[];
+}
+
+/** Machine-readable error codes the backend's ErrorResponse.code can carry. */
+export type ErrorCode = 'SUBSCRIPTION_SUSPENDED' | 'SUBSCRIPTION_PAST_DUE' | 'FEATURE_NOT_ENTITLED' | 'LIMIT_EXCEEDED';

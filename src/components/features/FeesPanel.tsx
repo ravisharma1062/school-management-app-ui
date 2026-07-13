@@ -6,6 +6,7 @@ import { paymentsApi } from '@/api/payments';
 import { extractErrorMessage } from '@/api/client';
 import { openRazorpayCheckout } from '@/lib/razorpay';
 import { useAuth } from '@/context/AuthContext';
+import { useSubscription } from '@/context/SubscriptionContext';
 import { FEE_STATUSES, formatDate, formatMoney } from '@/lib/format';
 import {
   Button,
@@ -29,7 +30,12 @@ export function FeesPanel({ studentId, canEdit }: { studentId: string; canEdit: 
   const { t } = useTranslation();
   const [editing, setEditing] = useState<FeeDto | null>(null);
   const { role, user } = useAuth();
-  const canPay = role === 'PARENT';
+  const { isEntitled } = useSubscription();
+  // isEntitled() defaults to permissive (true) since GET /subscription is ADMIN-only and a
+  // PARENT can't fetch it — this hides Pay when we DO know the plan excludes it (e.g. an admin
+  // viewing this same panel), but the backend's @RequiresEntitlement is what actually enforces
+  // it either way.
+  const canPay = role === 'PARENT' && isEntitled('ONLINE_PAYMENTS');
   const [payingFeeId, setPayingFeeId] = useState<string | null>(null);
   const [payError, setPayError] = useState<string | null>(null);
   const [paySuccess, setPaySuccess] = useState(false);

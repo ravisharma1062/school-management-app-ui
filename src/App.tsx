@@ -19,6 +19,7 @@ import { AnalyticsDashboardPage } from '@/pages/analytics/AnalyticsDashboardPage
 import { TransportRoutesPage } from '@/pages/transport/TransportRoutesPage';
 import { LibraryPage } from '@/pages/library/LibraryPage';
 import { NotificationPreferencesPage } from '@/pages/notification-preferences/NotificationPreferencesPage';
+import { AccountPage } from '@/pages/account/AccountPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export function App() {
@@ -67,6 +68,7 @@ export function App() {
             <Route path="/notification-preferences" element={<NotificationPreferencesPage />} />
             <Route path="/analytics" element={<AnalyticsDashboardPage />} />
             <Route path="/bus-routes" element={<TransportRoutesPage />} />
+            <Route path="/account" element={<AccountPage />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />

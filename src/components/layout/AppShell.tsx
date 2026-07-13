@@ -2,16 +2,21 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
+import { useSubscription } from '@/context/SubscriptionContext';
 import { usersApi } from '@/api/users';
 import { Sidebar } from './Sidebar';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { SuspendedScreen } from './SuspendedScreen';
+import { PastDueBanner } from './PastDueBanner';
 
 export function AppShell() {
   const { t } = useTranslation();
   const { user, role, logout, setLanguage } = useAuth();
+  const { isSuspended } = useSubscription();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   if (!role) return null;
+  if (isSuspended) return <SuspendedScreen />;
 
   async function onLanguageChange(lang: 'EN' | 'HI') {
     const updated = await usersApi.updateMyLanguage(lang);
@@ -108,6 +113,7 @@ export function AppShell() {
 
         {/* Main content */}
         <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          <PastDueBanner />
           <Outlet />
         </main>
       </div>

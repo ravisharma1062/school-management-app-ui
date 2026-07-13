@@ -60,7 +60,8 @@
     "users": "Users",
     "notificationPreferences": "Notifications",
     "analytics": "Analytics",
-    "busRoutes": "Bus Routes"
+    "busRoutes": "Bus Routes",
+    "account": "Account"
   },
   "login": {
     "brand": "School Management",
@@ -97,7 +98,39 @@
     "users": { "title": "Users", "description": "Manage teacher, parent and administrator accounts." },
     "notificationPreferences": { "title": "Notification Preferences", "description": "Choose which events send SMS or email. Push notifications for notices are always on." },
     "analytics": { "title": "Analytics", "description": "Attendance trends, fee collection, and at-risk students." },
-    "busRoutes": { "title": "Bus Routes", "description": "Manage routes, stops, and device location tokens." }
+    "busRoutes": { "title": "Bus Routes", "description": "Manage routes, stops, and device location tokens." },
+    "account": { "title": "Account", "description": "Your school's current plan and included features." }
+  },
+  "account": {
+    "currentPlan": "Current plan",
+    "trialEndsAt": "Trial ends",
+    "currentPeriodEnd": "Renews / ends",
+    "entitlements": "Included features",
+    "included": "Included",
+    "notIncluded": "Not included",
+    "limit": "limit {{count}}",
+    "status": {
+      "TRIAL": "Trial",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Past due",
+      "SUSPENDED": "Suspended",
+      "CANCELLED": "Cancelled"
+    },
+    "feature": {
+      "EMAIL_NOTIFICATIONS": "Email notifications",
+      "SMS_NOTIFICATIONS": "SMS notifications",
+      "ONLINE_PAYMENTS": "Online fee payments",
+      "MESSAGING": "Parent–teacher messaging",
+      "TRANSPORT_TRACKING": "Bus transport tracking",
+      "LIBRARY": "Library management",
+      "ANALYTICS": "Analytics dashboard",
+      "MAX_STUDENTS": "Student limit"
+    }
+  },
+  "subscription": {
+    "suspendedTitle": "Subscription suspended",
+    "suspendedMessage": "This school's subscription is currently suspended. Please contact your administrator or the school's billing owner to restore access.",
+    "pastDueMessage": "This school's subscription payment is past due. Please arrange payment soon to avoid a service interruption."
   },
   "students": {
     "importCsv": "Import CSV",
@@ -339,6 +372,7 @@
     "event": "Event",
     "sms": "SMS",
     "email": "Email",
+    "notInPlan": "Not included in the current plan",
     "ATTENDANCE_ABSENT": "Student marked absent",
     "FEE_OVERDUE": "Fee becomes overdue",
     "NOTICE_CREATED": "New notice posted",

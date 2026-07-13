@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { notificationPreferencesApi } from '@/api/notificationPreferences';
 import { extractErrorMessage } from '@/api/client';
+import { useSubscription } from '@/context/SubscriptionContext';
 import {
   Card,
   ErrorState,
@@ -19,6 +20,9 @@ import type { NotificationPreferenceDto } from '@/types';
 
 export function NotificationPreferencesPage() {
   const { t } = useTranslation();
+  const { isEntitled } = useSubscription();
+  const smsEntitled = isEntitled('SMS_NOTIFICATIONS');
+  const emailEntitled = isEntitled('EMAIL_NOTIFICATIONS');
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
@@ -80,18 +84,20 @@ export function NotificationPreferencesPage() {
                       <input
                         type="checkbox"
                         checked={pref.smsEnabled}
-                        disabled={mutation.isPending}
+                        disabled={mutation.isPending || !smsEntitled}
+                        title={smsEntitled ? undefined : t('notificationPreferences.notInPlan')}
                         onChange={() => toggle(pref, 'smsEnabled')}
-                        className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                        className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 disabled:opacity-30"
                       />
                     </TD>
                     <TD className="text-center">
                       <input
                         type="checkbox"
                         checked={pref.emailEnabled}
-                        disabled={mutation.isPending}
+                        disabled={mutation.isPending || !emailEntitled}
+                        title={emailEntitled ? undefined : t('notificationPreferences.notInPlan')}
                         onChange={() => toggle(pref, 'emailEnabled')}
-                        className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                        className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 disabled:opacity-30"
                       />
                     </TD>
                   </TR>
