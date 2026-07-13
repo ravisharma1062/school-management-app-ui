@@ -60,7 +60,8 @@
     "users": "उपयोगकर्ता",
     "notificationPreferences": "सूचना सेटिंग्स",
     "analytics": "विश्लेषण",
-    "busRoutes": "बस मार्ग"
+    "busRoutes": "बस मार्ग",
+    "account": "खाता"
   },
   "login": {
     "brand": "स्कूल प्रबंधन",
@@ -97,7 +98,39 @@
     "users": { "title": "उपयोगकर्ता", "description": "शिक्षक, अभिभावक और प्रशासक खातों का प्रबंधन करें।" },
     "notificationPreferences": { "title": "सूचना सेटिंग्स", "description": "चुनें कि किन घटनाओं पर SMS या ईमेल भेजा जाए। सूचनाओं के लिए पुश नोटिफिकेशन हमेशा चालू रहते हैं।" },
     "analytics": { "title": "विश्लेषण", "description": "उपस्थिति रुझान, फीस संग्रह, और जोखिम में छात्र।" },
-    "busRoutes": { "title": "बस मार्ग", "description": "मार्ग, स्टॉप और डिवाइस लोकेशन टोकन प्रबंधित करें।" }
+    "busRoutes": { "title": "बस मार्ग", "description": "मार्ग, स्टॉप और डिवाइस लोकेशन टोकन प्रबंधित करें।" },
+    "account": { "title": "खाता", "description": "आपके स्कूल की मौजूदा योजना और शामिल सुविधाएं।" }
+  },
+  "account": {
+    "currentPlan": "मौजूदा योजना",
+    "trialEndsAt": "ट्रायल समाप्ति तिथि",
+    "currentPeriodEnd": "नवीनीकरण / समाप्ति तिथि",
+    "entitlements": "शामिल सुविधाएं",
+    "included": "शामिल",
+    "notIncluded": "शामिल नहीं",
+    "limit": "सीमा {{count}}",
+    "status": {
+      "TRIAL": "ट्रायल",
+      "ACTIVE": "सक्रिय",
+      "PAST_DUE": "भुगतान बकाया",
+      "SUSPENDED": "निलंबित",
+      "CANCELLED": "रद्द"
+    },
+    "feature": {
+      "EMAIL_NOTIFICATIONS": "ईमेल सूचनाएं",
+      "SMS_NOTIFICATIONS": "SMS सूचनाएं",
+      "ONLINE_PAYMENTS": "ऑनलाइन फीस भुगतान",
+      "MESSAGING": "अभिभावक-शिक्षक संदेश",
+      "TRANSPORT_TRACKING": "बस परिवहन ट्रैकिंग",
+      "LIBRARY": "पुस्तकालय प्रबंधन",
+      "ANALYTICS": "विश्लेषण डैशबोर्ड",
+      "MAX_STUDENTS": "छात्र सीमा"
+    }
+  },
+  "subscription": {
+    "suspendedTitle": "सदस्यता निलंबित",
+    "suspendedMessage": "इस स्कूल की सदस्यता फ़िलहाल निलंबित है। कृपया पहुंच बहाल करने के लिए अपने प्रशासक या स्कूल के बिलिंग प्रभारी से संपर्क करें।",
+    "pastDueMessage": "इस स्कूल की सदस्यता का भुगतान बकाया है। सेवा में रुकावट से बचने के लिए कृपया जल्द भुगतान करें।"
   },
   "students": {
     "importCsv": "CSV आयात करें",
@@ -339,6 +372,7 @@
     "event": "घटना",
     "sms": "SMS",
     "email": "ईमेल",
+    "notInPlan": "मौजूदा योजना में शामिल नहीं",
     "ATTENDANCE_ABSENT": "छात्र अनुपस्थित दर्ज हुआ",
     "FEE_OVERDUE": "फीस अतिदेय हो गई",
     "NOTICE_CREATED": "नई सूचना पोस्ट हुई",

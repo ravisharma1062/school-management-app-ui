@@ -1,11 +1,13 @@
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useSubscription } from '@/context/SubscriptionContext';
 import { navFor } from './nav';
 import type { Role } from '@/types';
 
 export function Sidebar({ role, onNavigate }: { role: Role; onNavigate?: () => void }) {
   const { t } = useTranslation();
-  const items = navFor(role);
+  const { isEntitled } = useSubscription();
+  const items = navFor(role, isEntitled);
   return (
     <nav className="stagger flex flex-col gap-1.5 p-3" aria-label="Main navigation">
       {items.map((item) => (

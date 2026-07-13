@@ -15,6 +15,14 @@ const API_PREFIX = '/api/v1';
  */
 export const SESSION_EXPIRED_EVENT = 'sm:session-expired';
 
+/** Fired when the backend rejects a request with 403 SUBSCRIPTION_SUSPENDED. SubscriptionContext
+ * listens for this to render a full-screen blocking state. */
+export const SUBSCRIPTION_SUSPENDED_EVENT = 'sm:subscription-suspended';
+
+/** Fired when a successful response carries the X-Subscription-Status: PAST_DUE header.
+ * SubscriptionContext listens for this to show a dismissible banner. */
+export const SUBSCRIPTION_PAST_DUE_EVENT = 'sm:subscription-past-due';
+
 function emitSessionExpired() {
   window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
 }
@@ -59,13 +67,23 @@ async function refreshAccessToken(): Promise<string> {
 }
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.headers['x-subscription-status'] === 'PAST_DUE') {
+      window.dispatchEvent(new Event(SUBSCRIPTION_PAST_DUE_EVENT));
+    }
+    return response;
+  },
   async (error: AxiosError) => {
     const original = error.config as RetriableConfig | undefined;
     const status = error.response?.status;
 
     const isRefreshCall = original?.url?.includes('/auth/refresh');
     const isLoginCall = original?.url?.includes('/auth/login');
+
+    const code = (error.response?.data as { code?: string } | undefined)?.code;
+    if (status === 403 && code === 'SUBSCRIPTION_SUSPENDED') {
+      window.dispatchEvent(new Event(SUBSCRIPTION_SUSPENDED_EVENT));
+    }
 
     if (
       status === 401 &&
