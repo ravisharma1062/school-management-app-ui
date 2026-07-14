@@ -69,7 +69,11 @@ export function AccountPage() {
                     <span className="text-sm font-medium text-slate-700">{t(`account.feature.${e.featureKey}`)}</span>
                     <span className="flex items-center gap-2">
                       {e.limitValue != null && (
-                        <span className="text-xs text-slate-400">{t('account.limit', { count: e.limitValue })}</span>
+                        <span className="text-xs text-slate-400">
+                          {e.currentUsage != null
+                            ? t('account.usageLimit', { usage: e.currentUsage, limit: e.limitValue })
+                            : t('account.limit', { count: e.limitValue })}
+                        </span>
                       )}
                       <Badge tone={e.enabled ? 'green' : 'gray'}>
                         {e.enabled ? t('account.included') : t('account.notIncluded')}

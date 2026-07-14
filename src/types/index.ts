@@ -547,6 +547,7 @@ export interface EntitlementDto {
   featureKey: FeatureKey;
   enabled: boolean;
   limitValue: number | null;
+  currentUsage: number | null;
 }
 
 export interface SubscriptionDto {

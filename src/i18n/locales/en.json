@@ -109,6 +109,7 @@
     "included": "Included",
     "notIncluded": "Not included",
     "limit": "limit {{count}}",
+    "usageLimit": "{{usage}} / {{limit}}",
     "status": {
       "TRIAL": "Trial",
       "ACTIVE": "Active",
