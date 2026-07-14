@@ -44,6 +44,7 @@ export interface UserDto {
   role: Role;
   phone?: string | null;
   preferredLanguage: LanguageCode;
+  billingOwner: boolean;
 }
 
 export interface UserLanguageUpdateRequest {

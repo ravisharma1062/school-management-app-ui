@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/context/SubscriptionContext';
+import { useAuth } from '@/context/AuthContext';
 
 /** Dismissible-per-session awareness banner shown while the school's subscription is on TRIAL. */
 export function TrialBanner() {
   const { t } = useTranslation();
   const { subscription } = useSubscription();
+  const { user } = useAuth();
   const [dismissed, setDismissed] = useState(false);
 
   if (dismissed || subscription?.status !== 'TRIAL' || !subscription.trialEndsAt) return null;
@@ -19,9 +21,13 @@ export function TrialBanner() {
     >
       <span>
         🚀 {t('subscription.trialDaysLeft', { count: daysLeft })}{' '}
-        <a href="mailto:sales@school.app" className="font-semibold underline hover:no-underline">
-          {t('subscription.trialUpgradeCta')}
-        </a>
+        {user?.billingOwner ? (
+          <a href="mailto:sales@school.app" className="font-semibold underline hover:no-underline">
+            {t('subscription.trialUpgradeCta')}
+          </a>
+        ) : (
+          <span className="font-semibold">{t('subscription.askBillingOwner')}</span>
+        )}
       </span>
       <button
         type="button"

@@ -149,7 +149,8 @@
     "pastDueMessage": "This school's subscription payment is past due. Please arrange payment soon to avoid a service interruption.",
     "trialDaysLeft_one": "{{count}} day left in your free trial.",
     "trialDaysLeft_other": "{{count}} days left in your free trial.",
-    "trialUpgradeCta": "Contact us to upgrade"
+    "trialUpgradeCta": "Contact us to upgrade",
+    "askBillingOwner": "Ask your billing owner to upgrade"
   },
   "students": {
     "importCsv": "Import CSV",
@@ -378,6 +379,9 @@
     "emailCol": "Email",
     "roleCol": "Role",
     "phoneCol": "Phone",
+    "billingOwnerCol": "Billing owner",
+    "billingOwner": "Billing owner",
+    "makeBillingOwner": "Make billing owner",
     "addUserModal": "Add user",
     "fullName": "Full name",
     "email": "Email",
