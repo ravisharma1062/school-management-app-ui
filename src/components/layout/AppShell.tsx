@@ -9,6 +9,7 @@ import { Sidebar } from './Sidebar';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { SuspendedScreen } from './SuspendedScreen';
 import { PastDueBanner } from './PastDueBanner';
+import { TrialBanner } from './TrialBanner';
 
 export function AppShell() {
   const { t } = useTranslation();
@@ -128,6 +129,7 @@ export function AppShell() {
         {/* Main content */}
         <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
           <PastDueBanner />
+          <TrialBanner />
           <Outlet />
         </main>
       </div>

@@ -146,7 +146,10 @@
   "subscription": {
     "suspendedTitle": "Subscription suspended",
     "suspendedMessage": "This school's subscription is currently suspended. Please contact your administrator or the school's billing owner to restore access.",
-    "pastDueMessage": "This school's subscription payment is past due. Please arrange payment soon to avoid a service interruption."
+    "pastDueMessage": "This school's subscription payment is past due. Please arrange payment soon to avoid a service interruption.",
+    "trialDaysLeft_one": "{{count}} day left in your free trial.",
+    "trialDaysLeft_other": "{{count}} days left in your free trial.",
+    "trialUpgradeCta": "Contact us to upgrade"
   },
   "students": {
     "importCsv": "Import CSV",
