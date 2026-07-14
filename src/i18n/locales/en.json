@@ -129,6 +129,11 @@
       "BRANDING": "Custom branding"
     }
   },
+  "dataExport": {
+    "title": "Export your data",
+    "description": "Download a ZIP of everything your school has entered into the app — students, staff, attendance, homework, fees, exam results, and more.",
+    "downloadButton": "Download export"
+  },
   "branding": {
     "title": "Branding",
     "description": "Your school's logo and brand colors, shown across the portal.",

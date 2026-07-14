@@ -1,8 +1,9 @@
 import { useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { subscriptionApi } from '@/api/subscription';
 import { brandingApi } from '@/api/branding';
+import { dataExportApi } from '@/api/dataExport';
 import { useBranding } from '@/context/BrandingContext';
 import { extractErrorMessage } from '@/api/client';
 import { formatDate } from '@/lib/format';
@@ -87,10 +88,55 @@ export function AccountPage() {
             <BrandingSection
               isEntitled={query.data.entitlements.find((e) => e.featureKey === 'BRANDING')?.enabled ?? false}
             />
+
+            <DataExportSection />
           </div>
         )
       )}
     </div>
+  );
+}
+
+function DataExportSection() {
+  const { t } = useTranslation();
+  const [error, setError] = useState<string | null>(null);
+
+  const exportMutation = useMutation({
+    mutationFn: () => dataExportApi.download(),
+    onSuccess: (blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'school-data-export.zip';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    },
+    onError: (err) => setError(extractErrorMessage(err)),
+  });
+
+  return (
+    <Card className="p-6">
+      <h2 className="mb-1 text-sm font-bold text-slate-800">{t('dataExport.title')}</h2>
+      <p className="mb-4 text-xs text-slate-500">{t('dataExport.description')}</p>
+      {error && (
+        <div role="alert" className="mb-3 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+      <Button
+        size="sm"
+        variant="secondary"
+        loading={exportMutation.isPending}
+        onClick={() => {
+          setError(null);
+          exportMutation.mutate();
+        }}
+      >
+        {t('dataExport.downloadButton')}
+      </Button>
+    </Card>
   );
 }
 
