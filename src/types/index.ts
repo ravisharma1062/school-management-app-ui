@@ -540,7 +540,8 @@ export type FeatureKey =
   | 'TRANSPORT_TRACKING'
   | 'LIBRARY'
   | 'ANALYTICS'
-  | 'MAX_STUDENTS';
+  | 'MAX_STUDENTS'
+  | 'BRANDING';
 
 export interface EntitlementDto {
   featureKey: FeatureKey;
@@ -559,3 +560,10 @@ export interface SubscriptionDto {
 
 /** Machine-readable error codes the backend's ErrorResponse.code can carry. */
 export type ErrorCode = 'SUBSCRIPTION_SUSPENDED' | 'SUBSCRIPTION_PAST_DUE' | 'FEATURE_NOT_ENTITLED' | 'LIMIT_EXCEEDED';
+
+// --- Branding (Phase MT-6a) ---
+export interface BrandingDto {
+  hasLogo: boolean;
+  primaryColor: string | null;
+  secondaryColor: string | null;
+}

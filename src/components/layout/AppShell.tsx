@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { useSubscription } from '@/context/SubscriptionContext';
+import { useBranding } from '@/context/BrandingContext';
 import { usersApi } from '@/api/users';
 import { Sidebar } from './Sidebar';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -13,6 +14,7 @@ export function AppShell() {
   const { t } = useTranslation();
   const { user, role, logout, setLanguage } = useAuth();
   const { isSuspended } = useSubscription();
+  const { branding, logoUrl } = useBranding();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   if (!role) return null;
@@ -53,9 +55,21 @@ export function AppShell() {
               <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
             </svg>
           </button>
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-accent-500 text-lg shadow-glow">
-            🎓
-          </span>
+          {logoUrl ? (
+            <span
+              className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl shadow-glow"
+              style={branding?.primaryColor ? { backgroundColor: branding.primaryColor } : undefined}
+            >
+              <img src={logoUrl} alt="" className="h-full w-full object-contain p-1" />
+            </span>
+          ) : (
+            <span
+              className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-accent-500 text-lg shadow-glow"
+              style={branding?.primaryColor ? { background: branding.primaryColor } : undefined}
+            >
+              🎓
+            </span>
+          )}
           <div className="leading-tight">
             <span className="text-gradient block text-lg font-extrabold tracking-tight">School Management</span>
             <span className="hidden text-[11px] font-medium uppercase tracking-widest text-slate-400 sm:block">
