@@ -129,6 +129,30 @@
       "BRANDING": "Custom branding"
     }
   },
+  "billing": {
+    "title": "Billing",
+    "description": "This school pays by Demand Draft, Cheque, or NEFT — report a payment here and an operator will verify it against the bank statement.",
+    "amount": "Amount",
+    "method": "Payment method",
+    "methodLabel": {
+      "NEFT": "NEFT",
+      "CHEQUE": "Cheque",
+      "DEMAND_DRAFT": "Demand Draft"
+    },
+    "referenceNumber": "Reference number (UTR / cheque / DD number)",
+    "periodStart": "Period start",
+    "periodEnd": "Period end",
+    "reportPayment": "Report payment",
+    "history": "Payment history",
+    "noHistory": "No payments reported yet.",
+    "submitted": "Submitted",
+    "period": "Period",
+    "claimStatus": {
+      "PENDING_VERIFICATION": "Pending verification",
+      "VERIFIED": "Verified",
+      "REJECTED": "Rejected"
+    }
+  },
   "dataExport": {
     "title": "Export your data",
     "description": "Download a ZIP of everything your school has entered into the app — students, staff, attendance, homework, fees, exam results, and more.",

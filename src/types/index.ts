@@ -560,6 +560,32 @@ export interface SubscriptionDto {
   entitlements: EntitlementDto[];
 }
 
+// --- Manual billing (Phase MT-5) ---
+export type PaymentMethod = 'DEMAND_DRAFT' | 'CHEQUE' | 'NEFT';
+
+export type PaymentClaimStatus = 'PENDING_VERIFICATION' | 'VERIFIED' | 'REJECTED';
+
+export interface PaymentClaimDto {
+  id: string;
+  amount: number;
+  method: PaymentMethod;
+  referenceNumber: string;
+  periodStart: string;
+  periodEnd: string;
+  status: PaymentClaimStatus;
+  submittedAt: string;
+  verifiedAt: string | null;
+  notes: string | null;
+}
+
+export interface PaymentClaimCreateRequest {
+  amount: number;
+  method: PaymentMethod;
+  referenceNumber: string;
+  periodStart: string;
+  periodEnd: string;
+}
+
 /** Machine-readable error codes the backend's ErrorResponse.code can carry. */
 export type ErrorCode = 'SUBSCRIPTION_SUSPENDED' | 'SUBSCRIPTION_PAST_DUE' | 'FEATURE_NOT_ENTITLED' | 'LIMIT_EXCEEDED';
 
