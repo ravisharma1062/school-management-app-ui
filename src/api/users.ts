@@ -16,4 +16,9 @@ export const usersApi = {
     const { data } = await api.patch<UserDto>('/users/me/language', { preferredLanguage });
     return data;
   },
+
+  async setBillingOwner(userId: string): Promise<UserDto> {
+    const { data } = await api.patch<UserDto>(`/users/${userId}/billing-owner`, {});
+    return data;
+  },
 };

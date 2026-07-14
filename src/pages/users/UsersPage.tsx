@@ -3,6 +3,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { useTranslation } from 'react-i18next';
 import { usersApi } from '@/api/users';
 import { extractErrorMessage } from '@/api/client';
+import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@/lib/format';
 import {
   Badge,
@@ -35,15 +36,24 @@ const roleTone: Record<Role, 'purple' | 'blue' | 'green'> = {
 
 export function UsersPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
   const [roleFilter, setRoleFilter] = useState<Role | ''>('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [billingOwnerError, setBillingOwnerError] = useState<string | null>(null);
 
   const query = useQuery({
     queryKey: ['users', roleFilter, page],
     queryFn: () =>
       usersApi.list({ page, size: PAGE_SIZE, sort: 'name,asc', role: roleFilter || undefined }),
     placeholderData: keepPreviousData,
+  });
+
+  const billingOwnerMutation = useMutation({
+    mutationFn: (userId: string) => usersApi.setBillingOwner(userId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
+    onError: (err) => setBillingOwnerError(extractErrorMessage(err)),
   });
 
   return (
@@ -77,6 +87,12 @@ export function UsersPage() {
         </div>
       </div>
 
+      {billingOwnerError && (
+        <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+          {billingOwnerError}
+        </div>
+      )}
+
       {query.isLoading ? (
         <LoadingState />
       ) : query.isError ? (
@@ -93,6 +109,7 @@ export function UsersPage() {
                   <TH>{t('users.emailCol')}</TH>
                   <TH>{t('users.roleCol')}</TH>
                   <TH>{t('users.phoneCol')}</TH>
+                  <TH>{t('users.billingOwnerCol')}</TH>
                 </TR>
               </THead>
               <TBody>
@@ -104,6 +121,25 @@ export function UsersPage() {
                       <Badge tone={roleTone[u.role]}>{u.role}</Badge>
                     </TD>
                     <TD>{u.phone || '—'}</TD>
+                    <TD>
+                      {u.billingOwner ? (
+                        <Badge tone="purple">{t('users.billingOwner')}</Badge>
+                      ) : u.role === 'ADMIN' && user?.billingOwner ? (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          loading={billingOwnerMutation.isPending}
+                          onClick={() => {
+                            setBillingOwnerError(null);
+                            billingOwnerMutation.mutate(u.id);
+                          }}
+                        >
+                          {t('users.makeBillingOwner')}
+                        </Button>
+                      ) : (
+                        '—'
+                      )}
+                    </TD>
                   </TR>
                 ))}
               </TBody>
