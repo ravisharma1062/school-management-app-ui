@@ -124,8 +124,23 @@
       "TRANSPORT_TRACKING": "Bus transport tracking",
       "LIBRARY": "Library management",
       "ANALYTICS": "Analytics dashboard",
-      "MAX_STUDENTS": "Student limit"
+      "MAX_STUDENTS": "Student limit",
+      "BRANDING": "Custom branding"
     }
+  },
+  "branding": {
+    "title": "Branding",
+    "description": "Your school's logo and brand colors, shown across the portal.",
+    "notEntitled": "Custom branding isn't included in your current plan.",
+    "logo": "Logo",
+    "chooseFile": "Choose file",
+    "uploading": "Uploading…",
+    "noLogo": "No logo uploaded yet",
+    "primaryColor": "Primary color",
+    "secondaryColor": "Secondary color",
+    "save": "Save colors",
+    "saving": "Saving…",
+    "saved": "Branding updated."
   },
   "subscription": {
     "suspendedTitle": "Subscription suspended",
