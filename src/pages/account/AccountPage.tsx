@@ -1,14 +1,30 @@
-import { useState, type ChangeEvent } from 'react';
+import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { subscriptionApi } from '@/api/subscription';
 import { brandingApi } from '@/api/branding';
 import { dataExportApi } from '@/api/dataExport';
+import { billingApi } from '@/api/billing';
 import { useBranding } from '@/context/BrandingContext';
 import { extractErrorMessage } from '@/api/client';
-import { formatDate } from '@/lib/format';
-import { Badge, Button, Card, ErrorState, LoadingState, PageHeader } from '@/components/ui';
-import type { SchoolStatus } from '@/types';
+import { formatDate, formatMoney, todayIso } from '@/lib/format';
+import {
+  Badge,
+  Button,
+  Card,
+  ErrorState,
+  Input,
+  LoadingState,
+  PageHeader,
+  Select,
+  Table,
+  TBody,
+  TD,
+  TH,
+  THead,
+  TR,
+} from '@/components/ui';
+import type { PaymentClaimStatus, PaymentMethod, SchoolStatus } from '@/types';
 
 const STATUS_TONE: Record<SchoolStatus, 'green' | 'yellow' | 'red' | 'gray'> = {
   TRIAL: 'yellow',
@@ -85,6 +101,8 @@ export function AccountPage() {
               </ul>
             </Card>
 
+            <BillingSection />
+
             <BrandingSection
               isEntitled={query.data.entitlements.find((e) => e.featureKey === 'BRANDING')?.enabled ?? false}
             />
@@ -94,6 +112,169 @@ export function AccountPage() {
         )
       )}
     </div>
+  );
+}
+
+const CLAIM_STATUS_TONE: Record<PaymentClaimStatus, 'green' | 'yellow' | 'red'> = {
+  PENDING_VERIFICATION: 'yellow',
+  VERIFIED: 'green',
+  REJECTED: 'red',
+};
+
+const PAYMENT_METHODS: PaymentMethod[] = ['NEFT', 'CHEQUE', 'DEMAND_DRAFT'];
+
+const emptyClaimForm = {
+  amount: '',
+  method: 'NEFT' as PaymentMethod,
+  referenceNumber: '',
+  periodStart: todayIso(),
+  periodEnd: '',
+};
+
+function BillingSection() {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [form, setForm] = useState(emptyClaimForm);
+  const [error, setError] = useState<string | null>(null);
+
+  const instructionsQuery = useQuery({
+    queryKey: ['billing-instructions'],
+    queryFn: () => billingApi.getPaymentInstructions(),
+  });
+  const historyQuery = useQuery({
+    queryKey: ['billing-history'],
+    queryFn: () => billingApi.getMyHistory({ sort: 'submittedAt,desc' }),
+  });
+
+  const submitMutation = useMutation({
+    mutationFn: () =>
+      billingApi.submitPayment({
+        amount: Number(form.amount),
+        method: form.method,
+        referenceNumber: form.referenceNumber,
+        periodStart: form.periodStart,
+        periodEnd: form.periodEnd,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['billing-history'] });
+      setForm(emptyClaimForm);
+    },
+    onError: (err) => setError(extractErrorMessage(err)),
+  });
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    submitMutation.mutate();
+  }
+
+  return (
+    <Card className="p-6">
+      <h2 className="mb-1 text-sm font-bold text-slate-800">{t('billing.title')}</h2>
+      <p className="mb-4 text-xs text-slate-500">{t('billing.description')}</p>
+
+      {instructionsQuery.data && (
+        <div className="mb-5 whitespace-pre-wrap rounded-xl bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700">
+          {instructionsQuery.data}
+        </div>
+      )}
+
+      {error && (
+        <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={onSubmit} className="mb-6 space-y-4" noValidate>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Input
+            label={t('billing.amount')}
+            type="number"
+            min="0.01"
+            step="0.01"
+            required
+            value={form.amount}
+            onChange={(e) => setForm({ ...form, amount: e.target.value })}
+          />
+          <Select
+            label={t('billing.method')}
+            value={form.method}
+            onChange={(e) => setForm({ ...form, method: e.target.value as PaymentMethod })}
+          >
+            {PAYMENT_METHODS.map((m) => (
+              <option key={m} value={m}>
+                {t(`billing.methodLabel.${m}`)}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <Input
+          label={t('billing.referenceNumber')}
+          required
+          maxLength={100}
+          value={form.referenceNumber}
+          onChange={(e) => setForm({ ...form, referenceNumber: e.target.value })}
+        />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Input
+            label={t('billing.periodStart')}
+            type="date"
+            required
+            value={form.periodStart}
+            onChange={(e) => setForm({ ...form, periodStart: e.target.value })}
+          />
+          <Input
+            label={t('billing.periodEnd')}
+            type="date"
+            required
+            value={form.periodEnd}
+            onChange={(e) => setForm({ ...form, periodEnd: e.target.value })}
+          />
+        </div>
+        <Button type="submit" size="sm" loading={submitMutation.isPending}>
+          {t('billing.reportPayment')}
+        </Button>
+      </form>
+
+      <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">{t('billing.history')}</h3>
+      {historyQuery.isLoading ? (
+        <LoadingState />
+      ) : historyQuery.data && historyQuery.data.content.length === 0 ? (
+        <p className="text-sm text-slate-500">{t('billing.noHistory')}</p>
+      ) : (
+        historyQuery.data && (
+          <Table>
+            <THead>
+              <TR>
+                <TH>{t('billing.submitted')}</TH>
+                <TH>{t('billing.method')}</TH>
+                <TH>{t('billing.amount')}</TH>
+                <TH>{t('billing.period')}</TH>
+                <TH>{t('common.status')}</TH>
+              </TR>
+            </THead>
+            <TBody>
+              {historyQuery.data.content.map((claim) => (
+                <TR key={claim.id}>
+                  <TD>{formatDate(claim.submittedAt)}</TD>
+                  <TD>{t(`billing.methodLabel.${claim.method}`)}</TD>
+                  <TD>{formatMoney(claim.amount)}</TD>
+                  <TD>
+                    {formatDate(claim.periodStart)} – {formatDate(claim.periodEnd)}
+                  </TD>
+                  <TD>
+                    <Badge tone={CLAIM_STATUS_TONE[claim.status]}>{t(`billing.claimStatus.${claim.status}`)}</Badge>
+                    {claim.status === 'REJECTED' && claim.notes && (
+                      <p className="mt-1 text-xs text-slate-400">{claim.notes}</p>
+                    )}
+                  </TD>
+                </TR>
+              ))}
+            </TBody>
+          </Table>
+        )
+      )}
+    </Card>
   );
 }
 
