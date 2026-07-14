@@ -109,6 +109,7 @@
     "included": "शामिल",
     "notIncluded": "शामिल नहीं",
     "limit": "सीमा {{count}}",
+    "usageLimit": "{{usage}} / {{limit}}",
     "status": {
       "TRIAL": "ट्रायल",
       "ACTIVE": "सक्रिय",
