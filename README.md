@@ -1,9 +1,18 @@
 # School Management — Web (React + TypeScript)
 
-The web client for the School Management app. It is built entirely against the
-Spring Boot backend REST API (`/api/v1`) documented in
-[`../openapi.json`](../openapi.json). Supports the three roles **ADMIN**,
-**TEACHER**, and **PARENT**, with role-based navigation and route guards.
+The tenant-facing web client for the School Management app — one school per login. It is built
+entirely against the Spring Boot backend REST API (`/api/v1`), documented via Swagger UI at
+`<backend>/swagger-ui.html` and snapshotted at [`../backend/api-docs/openapi.json`](../backend/api-docs/openapi.json).
+Supports the three roles **ADMIN**, **TEACHER**, and **PARENT**, with role-based navigation and
+route guards. Two sibling apps also talk to this same backend but are out of scope for this repo:
+`school-management-app-operator` (internal platform-team console) and
+`school-management-app-marketing` (public site, signup forms) — see
+[`../PROJECT_KNOWLEDGE_BASE.md`](../PROJECT_KNOWLEDGE_BASE.md) for the full picture.
+
+This app also surfaces the school's **subscription** — plan, entitlements/usage, branding
+(logo/colors), manual billing (payment instructions, report-a-payment, claim history), and data
+export — all on the Account page (`/account`), gated per-section by role/entitlement/billing-owner
+status.
 
 ## Tech stack
 
@@ -32,9 +41,9 @@ npm install
 npm run dev               # http://localhost:5173
 ```
 
-The backend's CORS config allows `http://localhost:5173` by default, so no proxy
-is needed. If you run the web app on a different origin, update
-`app.cors.allowed-origins` on the backend.
+The backend's CORS config allows `http://localhost:5173` (plus `:5174`/`:5175` for the
+operator/marketing repos) by default, so no proxy is needed. If you run the web app on a
+different origin, update `app.cors.allowed-origins` on the backend.
 
 ### Default dev login
 
@@ -44,16 +53,19 @@ The backend seeds a development admin (see `V2__seed_dev_admin.sql`):
 - **Password:** `Admin@123`
 
 Use the admin to create teacher/parent accounts (**Users → Add user**) and
-students, then link students to a parent so the parent portal has data.
+students, then link students to a parent so the parent portal has data. A freshly-seeded school
+starts on an active subscription with all entitlements — there's no separate step needed to
+"activate" a plan for local dev.
 
 ## Scripts
 
 | Command | Description |
 |---|---|
 | `npm run dev` | Start the Vite dev server |
-| `npm run build` | Type-check (`tsc -b`) and produce a production build in `dist/` |
+| `npm run build` | Type-check (`tsc --noEmit`) and produce a production build in `dist/` via Vite |
 | `npm run preview` | Serve the production build locally |
 | `npm run typecheck` | Type-check without emitting |
+| `npm run lint` | ESLint over `.ts`/`.tsx` |
 
 ## Configuration
 
@@ -68,11 +80,14 @@ web/src/
 ├── api/            # axios client + JWT/refresh interceptor, one module per feature
 ├── components/
 │   ├── ui/         # design-system primitives (Button, Field, Table, Modal, …)
-│   ├── layout/     # AppShell, Sidebar, RequireAuth, RoleGuard, nav config
+│   ├── layout/     # AppShell, Sidebar, RequireAuth, RoleGuard, nav config,
+│   │               # SuspendedScreen, PastDueBanner, TrialBanner (subscription-status UI)
 │   └── features/   # cross-page feature panels (attendance, results, fees, class picker)
-├── context/        # AuthContext (login/logout, session bootstrap)
+├── context/        # AuthContext (login/logout, session bootstrap),
+│                   # SubscriptionContext (ADMIN-only plan/entitlements fetch),
+│                   # BrandingContext (logo/colors, fetched for every role)
 ├── lib/            # formatting helpers + enum option lists
-├── pages/          # one folder per feature area, plus LoginPage/DashboardPage
+├── pages/          # one folder per feature area, plus LoginPage/DashboardPage/account
 ├── types/          # hand-mirrored backend DTOs (kept in sync with openapi.json)
 ├── App.tsx         # route tree with role guards
 └── main.tsx        # providers: QueryClient, Router, AuthProvider
@@ -90,6 +105,11 @@ web/src/
 4. `RequireAuth` gates the authenticated area; `RoleGuard` restricts routes to
    specific roles. The backend re-checks every rule with `@PreAuthorize`, so the
    guards are UX only — not the security boundary.
+5. `SubscriptionContext` (ADMIN only) additionally watches every response for a
+   `SUBSCRIPTION_SUSPENDED` 403 or an `X-Subscription-Status: PAST_DUE` header, driving a
+   blocking `SuspendedScreen` or a dismissible `PastDueBanner`/`TrialBanner` respectively.
+   Non-ADMIN roles have no client-side visibility into subscription state — the backend's
+   `@RequiresEntitlement` checks are the real enforcement point regardless.
 
 ## Role capabilities
 
@@ -105,6 +125,10 @@ web/src/
 | Notices | post + view | view | view |
 | Fees | view + update | — | view own child |
 | Users | manage | — | — |
+| Account (plan, entitlements/usage) | view | — | — |
+| Branding (logo, colors) | view + edit (entitlement-gated) | — | — |
+| Billing (manual payment, claim history) | view + edit (billing-owner-gated for upgrade CTA) | — | — |
+| Data export | download | — | — |
 
 > The parent flow relies on `GET /api/v1/students/my-children`, which returns the
 > authenticated parent's linked children.
