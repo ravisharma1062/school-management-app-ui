@@ -16,7 +16,11 @@ jobs:
           node-version: '20'
           cache: npm
 
-      - run: npm ci
+      # npm ci fails here with EBADPLATFORM on esbuild's netbsd-arm64 optional binary — a real
+      # npm bug where it hard-fails on a legitimately-skippable cross-platform optional dep
+      # instead of silently skipping it (confirmed reproducing on ubuntu-latest, not just
+      # locally). npm install doesn't have this problem and is what's verified working.
+      - run: npm install
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
