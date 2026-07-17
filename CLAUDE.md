@@ -4,6 +4,8 @@ React web portal for the School Management App — the tenant-facing client (one
 
 **Sibling repos** (same backend, different clients — not shared code, not in this repo): `school-management-app-backen` (the API), `school-management-app-android` (mobile, same tenant model), `school-management-app-operator` (internal platform-team console), `school-management-app-marketing` (public site). Backend DTOs are hand-mirrored here in `src/types/index.ts` with no shared schema/codegen — when a backend DTO changes, this file needs a manual update.
 
+**If you're editing `src/types/index.ts` because a backend DTO changed:** the same DTO likely needs updating in other clients too — check the backend's `CLAUDE.md` "Cross-repo checklist" section for which ones (core school-domain DTOs also need Android's `domain/model/Models.kt`; platform/billing DTOs used on the Account page may also need `operator`).
+
 ## Stack
 
 React 18.3 + TypeScript 5.5 (strict), Vite 5.3, Tailwind CSS 3.4 (hand-built design-system primitives, no MUI/AntD), TanStack React Query 5.51, React Router DOM 6.24, axios 1.7, i18next/react-i18next (EN/HI), Leaflet/react-leaflet (bus map), Razorpay Checkout.js (loaded dynamically, not an npm dep), Vitest + React Testing Library for tests.
